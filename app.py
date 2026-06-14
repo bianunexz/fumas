@@ -11,19 +11,17 @@ st.set_page_config(page_title="Cortina de Fumaça", page_icon="🌫️", layout=
 groq_key = st.secrets["GROQ_KEY"]
 client = Groq(api_key=groq_key)
 
-# CSS simples e elegante
+# CSS simples
 st.markdown("""
 <style>
     .main-title { font-size: 2.5rem; font-weight: bold; }
     .subtitle { color: #888; font-style: italic; margin-bottom: 2rem; }
     .fofoca-item { padding: 1rem; margin: 0.5rem 0; background: #fff5f5; border-left: 4px solid #ff4444; border-radius: 4px; }
     .noticia-item { padding: 1rem; margin: 0.5rem 0; background: #f0f8f0; border-left: 4px solid #2d7a27; border-radius: 4px; }
-    .analise-box { padding: 1rem; margin: 0.5rem 0; background: #fafafa; border-radius: 8px; }
     .pergunta { font-style: italic; font-size: 1.1rem; padding: 1rem; background: #fff; border-top: 3px solid #ff4444; }
 </style>
 """, unsafe_allow_html=True)
 
-# Título
 st.markdown('<p class="main-title">🌫️ Cortina de Fumaça</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Nem tudo que domina sua timeline é o que mais impacta sua vida.</p>', unsafe_allow_html=True)
 
@@ -36,12 +34,9 @@ with st.sidebar:
     Mostramos como entretenimento domina nossa atenção enquanto notícias importantes passam batido.
     
     **Agenda-setting:** a mídia não diz o que pensar, mas sobre o que pensar.
-    
-    ---
-    ⚠️ Não acusamos ninguém. Não é conspiração.
     """)
 
-# Função simples para extrair JSON
+# Função para extrair JSON
 def extrair_json(texto):
     texto = texto.strip()
     if "```" in texto:
@@ -50,25 +45,37 @@ def extrair_json(texto):
             texto = texto[4:]
     return json.loads(texto.strip())
 
-# Função para consultar a API com retry
-def consultar_groq(prompt, max_tokens=500):
-    """Consulta a API com retry em caso de rate limit"""
+# Função de consulta ultra-simples
+def buscar_tendencias(tipo):
+    """Busca fofocas ou notícias com prompt mínimo"""
+    
+    if tipo == "fofocas":
+        prompt = "Liste 5 fofocas do Brasil desta semana. JSON: {fofocas:[{titulo,descricao,link,fonte}]}"
+    else:
+        prompt = "Liste 4 noticias serias do Brasil desta semana sobre Congresso,STF,meio ambiente. JSON: {noticias:[{titulo,descricao,link,fonte}]}"
+    
     for tentativa in range(3):
         try:
             resposta = client.chat.completions.create(
                 model="compound-beta",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-                max_tokens=max_tokens
+                temperature=0.1,
+                max_tokens=300
             )
-            return resposta.choices[0].message.content
+            texto = resposta.choices[0].message.content
+            dados = extrair_json(texto)
+            return dados.get("fofocas") or dados.get("noticias") or []
         except Exception as e:
-            if "429" in str(e) or "rate_limit" in str(e):
-                time.sleep(2)  # Espera 2 segundos
+            if "429" in str(e):
+                time.sleep(3)
                 continue
+            elif "413" in str(e):
+                st.error("Prompt muito grande. Tente novamente.")
+                return []
             else:
-                raise e
-    return None
+                st.error(f"Erro: {str(e)[:100]}")
+                return []
+    return []
 
 # Botão principal
 if st.button("🔍 Descobrir o que está bombando esta semana", type="primary", use_container_width=True):
@@ -77,39 +84,18 @@ if st.button("🔍 Descobrir o que está bombando esta semana", type="primary", 
     semana_inicio = hoje - timedelta(days=7)
     periodo = f"{semana_inicio.strftime('%d/%m')} a {hoje.strftime('%d/%m')}"
     
-    fofocas = []
-    noticias = []
+    # Buscar fofocas
+    with st.spinner("🔥 Buscando o que bombou..."):
+        fofocas = buscar_tendencias("fofocas")
+        time.sleep(2)  # Pausa para rate limit
     
-    # ── BUSCAR FOFOCAS ──
-    with st.spinner("🔥 Buscando o que bombou esta semana..."):
-        prompt_fofocas = f"""Busque na web agora: 5 maiores fofocas/entretenimento da semana {periodo} no Brasil. Nomes reais. Retorne JSON: {{"fofocas":[{{"titulo":"","descricao":"","link":"","fonte":""}}]}}"""
-        
-        try:
-            resposta = consultar_groq(prompt_fofocas, max_tokens=400)
-            if resposta:
-                dados = extrair_json(resposta)
-                fofocas = dados.get("fofocas", [])
-        except Exception as e:
-            st.error(f"Erro fofocas: {str(e)[:200]}")
-    
-    # Pequena pausa para não estourar rate limit
-    time.sleep(1)
-    
-    # ── BUSCAR NOTÍCIAS ──
+    # Buscar notícias
     with st.spinner("📰 Buscando notícias importantes..."):
-        prompt_noticias = f"""Busque na web agora: 4 notícias sérias da semana {periodo} Brasil/mundo sobre Congresso, STF, meio ambiente, saúde ou direitos humanos. Retorne JSON: {{"noticias":[{{"titulo":"","descricao":"","link":"","fonte":""}}]}}"""
-        
-        try:
-            resposta = consultar_groq(prompt_noticias, max_tokens=400)
-            if resposta:
-                dados = extrair_json(resposta)
-                noticias = dados.get("noticias", [])
-        except Exception as e:
-            st.error(f"Erro notícias: {str(e)[:200]}")
+        noticias = buscar_tendencias("noticias")
     
-    # ── MOSTRAR RESULTADOS ──
+    # Mostrar resultados
     if fofocas or noticias:
-        st.success(f"✅ Semana analisada: {periodo}")
+        st.success(f"✅ Semana: {periodo}")
         
         col1, col2 = st.columns(2)
         
@@ -121,21 +107,27 @@ if st.button("🔍 Descobrir o que está bombando esta semana", type="primary", 
                     if f.get("link"):
                         st.markdown(f"[📎 {f.get('fonte', 'Fonte')}]({f.get('link')})")
                     
-                    # Botão de análise individual
                     if st.button(f"🧠 Analisar", key=f"analisar_{i}"):
-                        with st.spinner("Gerando análise..."):
-                            prompt_analise = f"""Analise como educador midiático. Fofoca: {f.get('titulo','')}. Notícias sérias da mesma semana: {'; '.join([n.get('titulo','') for n in noticias])}. Explique por que viralizou, como ambos coexistiram (use 'enquanto isso'), e faça pergunta reflexiva. JSON: {{"porque":"","coexistencia":"","pergunta":""}}"""
+                        with st.spinner("Analisando..."):
+                            titulos_noticias = [n.get('titulo','') for n in noticias]
+                            
+                            prompt_analise = f"Fofoca: {f.get('titulo','')}. Noticias serias: {titulos_noticias}. Explique porque viralizou e como coexistiu com noticias serias (use 'enquanto isso'). JSON: {{porque,coexistencia,pergunta}}"
                             
                             try:
-                                resp = consultar_groq(prompt_analise, max_tokens=300)
-                                if resp:
-                                    analise = extrair_json(resp)
-                                    st.markdown("---")
-                                    st.markdown(f"**Por que dominou:** {analise.get('porque', '')}")
-                                    st.markdown(f"**Enquanto isso:** {analise.get('coexistencia', '')}")
-                                    st.markdown(f'<div class="pergunta">❝ {analise.get("pergunta", "")} ❞</div>', unsafe_allow_html=True)
+                                resp = client.chat.completions.create(
+                                    model="compound-beta",
+                                    messages=[{"role": "user", "content": prompt_analise}],
+                                    temperature=0.3,
+                                    max_tokens=200
+                                )
+                                analise = extrair_json(resp.choices[0].message.content)
+                                
+                                st.markdown("---")
+                                st.markdown(f"**Por que dominou:** {analise.get('porque', '')}")
+                                st.markdown(f"**Enquanto isso:** {analise.get('coexistencia', '')}")
+                                st.markdown(f'<div class="pergunta">❝ {analise.get("pergunta", "")} ❞</div>', unsafe_allow_html=True)
                             except:
-                                st.warning("Análise indisponível")
+                                st.warning("Análise indisponível no momento")
         
         with col2:
             st.subheader("📰 O que realmente importa")
@@ -148,7 +140,6 @@ if st.button("🔍 Descobrir o que está bombando esta semana", type="primary", 
                 </div>
                 """, unsafe_allow_html=True)
         
-        # Mensagem final
         st.markdown("---")
         st.markdown("""
         ### 🌫️ O efeito cortina de fumaça
@@ -156,12 +147,10 @@ if st.button("🔍 Descobrir o que está bombando esta semana", type="primary", 
         **Agenda-setting**: a mídia não diz o que pensar, mas determina sobre o que pensamos.
         
         Enquanto você consumia entretenimento esta semana, decisões importantes estavam sendo tomadas.
-        
-        **Na próxima semana, o que você vai escolher consumir?**
         """)
     
     else:
-        st.warning("Tente novamente em alguns segundos (limite da API).")
+        st.warning("Não foi possível carregar. Tente novamente em alguns segundos.")
 
 st.markdown("---")
-st.caption("🌫️ Cortina de Fumaça — Educação midiática com Python + Streamlit + Groq")
+st.caption("🌫️ Cortina de Fumaça — Educação midiática | Streamlit + Groq")
