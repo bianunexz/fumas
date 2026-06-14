@@ -5,6 +5,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 import json
 from email.utils import parsedate_to_datetime
+import random # Importante para diversificar
 
 # 1. Configurações
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
@@ -18,10 +19,11 @@ def formatar_data(data_rss):
     except:
         return "Nesta semana"
 
-def buscar_no_google_news(termo_busca, prefixo_id, max_itens=10):
+def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20): # Aumentamos para 20
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
-        url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+        # O &num=20 garante que buscaremos mais resultados
+        url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419&num=20"
         
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
         
@@ -30,9 +32,13 @@ def buscar_no_google_news(termo_busca, prefixo_id, max_itens=10):
             xml_data = response.read()
             
         root = ET.fromstring(xml_data)
-        noticias = []
+        itens = root.findall('.//item')
         
-        for i, item in enumerate(root.findall('.//item')[:max_itens]):
+        # Sorteia uma amostra aleatória dos resultados para nunca vir a mesma lista
+        amostra = random.sample(itens, min(len(itens), max_itens))
+        
+        noticias = []
+        for i, item in enumerate(amostra):
             titulo_completo = item.find('title').text
             if ' - ' in titulo_completo:
                 titulo = titulo_completo.rsplit(' - ', 1)[0]
@@ -58,15 +64,12 @@ st.write("Nem tudo que domina sua timeline é o que mais impacta sua vida.")
 
 if "dados_prontos" not in st.session_state:
     st.session_state.dados_prontos = False
-    st.session_state.resultado = {}
-    st.session_state.fofocas_originais = {}
-    st.session_state.serias_originais = {}
 
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando o ecossistema de notícias..."):
         try:
-            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado OR viralizou", "F", max_itens=10)
-            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial", "S", max_itens=10)
+            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado OR viralizou", "F")
+            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial", "S")
             
             if not fofocas_brutas or not serias_brutas:
                 st.error("O buscador falhou. Tente novamente.")
@@ -79,8 +82,10 @@ if st.button("Descobrir os assuntos da semana"):
             serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
             
             prompt = f"""
-            Analise os dados e crie entre 3 e 5 PARES de notícias.
-            Regras: 1 Fofoca (entretenimento) + 1 Notícia Séria (política/impacto social).
+            Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
+            Regras: 
+            1. Seja surpreendente: escolha assuntos variados.
+            2. Evite o óbvio e busque o contraste entre o fútil e o urgente.
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria.
             Dados: {fofocas_dieta} | {serias_dieta}
             """
@@ -88,7 +93,7 @@ if st.button("Descobrir os assuntos da semana"):
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
+                temperature=0.7, # Aumentamos a temperatura para a IA ser mais criativa/variada
                 response_format={"type": "json_object"}
             )
             
@@ -98,7 +103,7 @@ if st.button("Descobrir os assuntos da semana"):
             st.error(f"Erro ao processar: {e}")
 
 # 3. Exibição
-if st.session_state.dados_prontos:
+if st.session_state.get("dados_prontos"):
     st.subheader("🔥 Assuntos em alta da semana")
     for idx, par in enumerate(st.session_state.resultado.get("pares", [])):
         fofoca = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
