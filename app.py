@@ -68,7 +68,7 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando o ecossistema de notícias..."):
         try:# 
-            fofocas_brutas = buscar_no_google_news("briga OR influenciadora OR barraco OR treta OR reality OR viral OR famoso OR flagra OR fofoca OR celebridade OR virginia", "F")
+            fofocas_brutas = buscar_no_google_news("briga OR influenciadora OR barraco OR treta OR reality OR viral OR famoso OR flagra OR fofoca OR celebridade", "F")
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial", "S")
             
             if not fofocas_brutas or not serias_brutas:
