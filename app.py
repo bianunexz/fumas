@@ -48,7 +48,7 @@ if st.button("Descobrir o que bombou esta semana"):
             
             # Chamada super segura para a Groq
             resposta = client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama-3.1-8b-instant", # <--- A ÚNICA LINHA QUE MUDA
                 messages=[
                     {"role": "system", "content": "Você só responde em formato JSON estruturado. Sem introduções."},
                     {"role": "user", "content": prompt}
