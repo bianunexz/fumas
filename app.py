@@ -62,8 +62,8 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando a atenção da internet..."):
         try:
-            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado", max_itens=8)
-            serias_brutas = buscar_no_google_news("projeto de lei OR senado OR stf OR pec", max_itens=8)
+            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado", max_itens=6)
+            serias_brutas = buscar_no_google_news("projeto de lei OR senado OR stf OR pec", max_itens=6)
             
             prompt = f"""
             Você é um curador rigoroso de dados.
