@@ -1,79 +1,100 @@
 import streamlit as st
-from google import genai
-from google.genai import types
+from groq import Groq
+import urllib.request
+import xml.etree.ElementTree as ET
+import re
 import json
 
-# Configuração da página do Streamlit
+# Configuração da página
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
+client = Groq() # Ele vai puxar a GROQ_API_KEY que já está lá nos seus Secrets!
 
-# Inicializa o novo cliente oficial do Google (Lê o GEMINI_API_KEY dos Secrets automaticamente)
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+# Função que lê as notícias direto da fonte oficial, sem depender de buscadores
+def buscar_noticias_g1(url_rss, max_itens=10):
+    try:
+        # Finge ser um navegador normal para o site não bloquear
+        req = urllib.request.Request(url_rss, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            xml_data = response.read()
+            
+        root = ET.fromstring(xml_data)
+        noticias = []
+        
+        for item in root.findall('.//item')[:max_itens]:
+            titulo = item.find('title').text
+            link = item.find('link').text
+            descricao_bruta = item.find('description').text if item.find('description') is not None else ""
+            
+            # Limpa qualquer sujeira de código HTML que venha no texto
+            descricao_limpa = re.sub('<[^<]+>', '', descricao_bruta).strip()
+            
+            noticias.append({"titulo": titulo, "link": link, "resumo": descricao_limpa[:150]})
+            
+        return noticias
+    except Exception as e:
+        return []
 
-# Textos Iniciais da Interface
+# Interface
 st.title("📰 CORTINA DE FUMAÇA")
 st.write("Nem tudo que domina sua timeline é o que mais impacta sua vida.")
 
-# Variáveis de estado para controlar o clique do botão
 if "dados_prontos" not in st.session_state:
     st.session_state.dados_prontos = False
     st.session_state.resultado = {}
 
-# O Botão Principal
 if st.button("Descobrir o que bombou esta semana"):
-    with st.spinner("O Gemini está navegando na Web e analisando os algoritmos desta semana..."):
+    with st.spinner("Lendo feeds de notícias e analisando o peso dos algoritmos..."):
         try:
-            # Criamos o prompt dizendo exatamente o que queremos coletar na internet
-            prompt = """
-            Faça uma pesquisa na web sobre o cenário atual do Brasil nesta semana corrente de junho de 2026.
+            # Puxa dados REAIS e instantâneos do RSS do G1
+            fofocas_brutas = buscar_noticias_g1('https://g1.globo.com/rss/g1/pop-arte/')
+            serias_brutas = buscar_noticias_g1('https://g1.globo.com/rss/g1/politica/')
             
-            Selecione e organize:
-            1. As 5 maiores fofocas, polêmicas de celebridades ou assuntos de entretenimento que mais geraram engajamento e cliques.
-            2. De 3 a 5 notícias sérias (como projetos de lei no Congresso, votações, decisões do STF, economia ou pautas sociais) que aconteceram no mesmo período.
+            prompt = f"""
+            Você é um curador de dados. 
+            Com base EXCLUSIVAMENTE nestas notícias reais do Brasil capturadas agora, selecione 5 fofocas/entretenimento e 3 notícias sérias de política.
             
-            Você deve retornar estritamente um código JSON estruturado usando esta formatação exata:
-            {
-              "fofocas": [ {"titulo": "Manchete da fofoca", "link": "URL real da fonte encontrada", "resumo": "Explicação curta do motivo de ter viralizado"} ],
-              "serias": [ {"titulo": "Manchete séria", "link": "URL real da fonte encontrada", "resumo": "Explicação curta do impacto real"} ]
-            }
-            Não insira nenhuma introdução, saudação ou bloco de texto markdown fora do JSON.
+            Retorne APENAS um JSON válido nesta estrutura:
+            {{
+              "fofocas": [ {{"titulo": "T", "link": "L", "resumo": "R"}} ],
+              "serias": [ {{"titulo": "T", "link": "L", "resumo": "R"}} ]
+            }}
+            
+            FOFOCAS: {fofocas_brutas}
+            SÉRIAS: {serias_brutas}
             """
-
-            # Chamada do modelo usando a nova biblioteca padrão de 2026
-            # Habilitamos a ferramenta 'google_search' para ele buscar na web em tempo real
-          # Chamada do modelo usando a nova biblioteca e a versão atualizada da IA
-            resposta = client.models.generate_content(
-                model='gemini-2.0-flash', # <--- A ÚNICA MUDANÇA É AQUI
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    tools=[{"google_search": {}}],  # Ativa a busca nativa do Google!
-                    response_mime_type="application/json",  # Garante o retorno estruturado
-                ),
+            
+            # Voltamos para o modelo da Groq que tinha funcionado perfeitamente
+            resposta = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {"role": "system", "content": "Você só responde em formato JSON estruturado."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.1
             )
             
-            # Limpeza rápida para garantir que pegamos apenas o objeto JSON
-            texto_resposta = resposta.text.strip()
-            if texto_resposta.startswith("```"):
-                texto_resposta = texto_resposta.replace("```json", "").replace("```", "").strip()
-
-            st.session_state.resultado = json.loads(texto_resposta)
+            texto_limpo = resposta.choices[0].message.content.strip()
+            if texto_limpo.startswith("```"):
+                texto_limpo = texto_limpo.replace("
+```json", "").replace("```", "").strip()
+                
+            st.session_state.resultado = json.loads(texto_limpo)
             st.session_state.dados_prontos = True
 
         except Exception as e:
-            st.error("Houve uma falha ao estruturar os dados da pesquisa de mídia. Tente clicar no botão novamente.")
+            st.error("Ops! Tivemos um engasgo na hora de processar os dados. Tente de novo!")
             st.caption(f"Detalhe técnico: {e}")
 
 st.write("---")
 
-# Exibição dinâmica dos resultados coletados
+# Renderiza os dados
 if st.session_state.dados_prontos and "fofocas" in st.session_state.resultado:
     st.subheader("🔥 Top assuntos da semana")
-    st.caption("Clique em uma fofoca para ver como os algoritmos disputaram sua atenção:")
     
-    for idx, fofoca in enumerate(st.session_state.resultado["fofocas"]):
-        # Chave única para cada botão gerado no loop
-        if st.button(f"👉 {fofoca['titulo']}", key=f"btn_fofoca_{idx}"):
+    for fofoca in st.session_state.resultado["fofocas"]:
+        if st.button(f"👉 {fofoca['titulo']}"):
             
-            st.markdown(f"**Por que bombou?** {fofoca['resumo']}")
+            st.markdown(f"**Por que bombou?** {fofoca['resumo']}...")
             st.markdown(f"[🔗 Ver fonte da fofoca]({fofoca['link']})")
             
             st.write("---")
@@ -81,7 +102,7 @@ if st.session_state.dados_prontos and "fofocas" in st.session_state.resultado:
             
             for seria in st.session_state.resultado.get("serias", []):
                 st.markdown(f"**{seria['titulo']}**")
-                st.markdown(f"{seria['resumo']}")
+                st.markdown(f"{seria['resumo']}...")
                 st.markdown(f"[🔗 Ler a notícia completa]({seria['link']})")
                 st.write("")
             
