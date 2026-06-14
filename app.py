@@ -8,7 +8,7 @@ import json
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
 client = Groq()
 
-def buscar_no_google_news(termo_busca, max_itens=10): # Aumentamos para 10 para ter mais opções
+def buscar_no_google_news(termo_busca, max_itens=8):
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
         url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
@@ -33,7 +33,6 @@ def buscar_no_google_news(termo_busca, max_itens=10): # Aumentamos para 10 para 
             link = item.find('link').text
             data_pub = item.find('pubDate').text
             
-            # Mandamos a data crua, a IA vai formatar
             noticias.append({
                 "titulo": titulo, 
                 "veiculo": veiculo,
@@ -55,10 +54,8 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando a atenção da internet..."):
         try:
-            # Termos muito mais focados no puro suco da fofoca brasileira
-            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado OR flagra", max_itens=8)
-            # Focando nas burocracias de alto impacto
-            serias_brutas = buscar_no_google_news("Politica OR investigação OR senado OR stf OR pec", max_itens=8)
+            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado", max_itens=8)
+            serias_brutas = buscar_no_google_news("projeto de lei OR senado OR stf OR pec", max_itens=8)
             
             if not fofocas_brutas or not serias_brutas:
                 st.error("O buscador falhou na coleta de dados. Tente novamente.")
@@ -69,16 +66,16 @@ if st.button("Descobrir os assuntos da semana"):
             Sua tarefa é ler os resultados abaixo e criar entre 3 e 5 PARES ÚNICOS de notícias.
             
             REGRAS:
-            1. FOFOCAS: Escolha APENAS polêmicas, trivialidades de famosos, barracos ou memes. Evite notícias de "Dia dos Namorados" ou coisas comportadas.
+            1. FOFOCAS: Escolha APENAS polêmicas, trivialidades de famosos, barracos ou memes. Evite coisas comportadas.
             2. SÉRIAS: Escolha APENAS votações, leis e impacto político pesado.
             3. EMPARELHAMENTO: Forme no mínimo 3 pares, máximo 5. Cada par tem 1 fofoca e 1 séria diferente.
             
-            Retorne APENAS um JSON válido nesta estrutura exata:
+            Retorne APENAS um JSON válido nesta estrutura exata com a chave "pares":
             {{
               "pares": [
                 {{
-                  "fofoca": {{"titulo": "T", "veiculo": "V", "link": "L", "resumo": "Por que viralizou?", "data_formatada": "Reescreva a data crua em português (Ex: 12 de Junho). SEM HORÁRIO GMT."}},
-                  "seria": {{"titulo": "T", "veiculo": "V", "link": "L", "resumo": "Qual o impacto na sociedade?", "data_formatada": "Reescreva a data crua em português (Ex: 12 de Junho). SEM HORÁRIO GMT."}}
+                  "fofoca": {{"titulo": "T", "veiculo": "V", "link": "L", "resumo": "Por que viralizou?", "data_formatada": "Ex: 12 de Junho"}},
+                  "seria": {{"titulo": "T", "veiculo": "V", "link": "L", "resumo": "Qual o impacto na sociedade?", "data_formatada": "Ex: 12 de Junho"}}
                 }}
               ]
             }}
@@ -90,7 +87,7 @@ if st.button("Descobrir os assuntos da semana"):
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[
-                    {"role": "system", "content": "Você atua como um filtro editorial. Retorne apenas JSON."},
+                    {"role": "system", "content": "Você atua como um filtro editorial. Retorne apenas JSON com a chave 'pares'."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3, 
@@ -106,5 +103,58 @@ if st.button("Descobrir os assuntos da semana"):
 
         except Exception as e:
             st.error("Ops! Tivemos um engasgo na conexão com os dados. Clique no botão mais uma vez!")
-            # VOLTEI COM ESSA LINHA PARA A GENTE VER O ERRO SE ELE ACONTECER:
             st.caption(f"Detalhe técnico: {e}")
+
+st.write("---")
+
+# Renderização flexível e à prova de falhas
+if st.session_state.dados_prontos:
+    st.subheader("🔥 Assuntos em alta da semana")
+    
+    # Modo caça-dados: Tenta pegar a chave "pares", mas se falhar, pega qualquer lista que a IA tenha gerado
+    lista_pares = st.session_state.resultado.get("pares")
+    
+    if not lista_pares and len(st.session_state.resultado) > 0:
+        primeira_chave = list(st.session_state.resultado.keys())[0]
+        lista_pares = st.session_state.resultado[primeira_chave]
+
+    # Se mesmo assim não for uma lista, o código grita e mostra o problema
+    if not lista_pares or not isinstance(lista_pares, list):
+        st.warning("⚠️ Os algoritmos se confundiram na hora de tabular os dados. Veja o resultado bruto abaixo:")
+        st.json(st.session_state.resultado)
+    else:
+        for idx, par in enumerate(lista_pares):
+            fofoca = par.get("fofoca")
+            seria = par.get("seria")
+            
+            if not fofoca or not seria:
+                continue
+                
+            titulo_f = fofoca.get('titulo', 'Assunto em alta')
+            data_f = fofoca.get('data_formatada', 'Nesta semana')
+            veiculo_f = fofoca.get('veiculo', 'Internet')
+            resumo_f = fofoca.get('resumo', 'Viralizou nas redes.')
+            link_f = fofoca.get('link', '#')
+
+            titulo_s = seria.get('titulo', 'Notícia importante')
+            data_s = seria.get('data_formatada', 'Nesta semana')
+            veiculo_s = seria.get('veiculo', 'Portal de Notícias')
+            resumo_s = seria.get('resumo', 'Impacto na sociedade.')
+            link_s = seria.get('link', '#')
+            
+            if st.button(f"👉 {titulo_f}", key=f"btn_fofoca_{idx}"):
+                
+                st.markdown(f"📅 *{data_f}* | 📰 **Fonte:** {veiculo_f}")
+                st.markdown(f"**Por que bombou?** {resumo_f}")
+                st.markdown(f"[🔗 Ver na fonte]({link_f})")
+                
+                st.write("---")
+                
+                st.subheader("🌫️ Enquanto isso, na mesma época...")
+                st.markdown(f"📅 *{data_s}* | 📰 **Fonte:** {veiculo_s}")
+                st.markdown(f"**{titulo_s}**")
+                st.markdown(f"{resumo_s}")
+                st.markdown(f"[🔗 Ler a notícia]({link_s})")
+                
+                st.write("---")
+                st.info("💭 **Para pensar:** Como as plataformas direcionam a sua atenção? A mídia não escondeu essa notícia séria, mas os algoritmos priorizaram o engajamento do entretenimento.")
