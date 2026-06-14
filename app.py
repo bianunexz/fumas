@@ -1,101 +1,77 @@
 import streamlit as st
-import google.generativeai as genai
-from duckduckgo_search import DDGS
+from google import genai
+from google.genai import types
 import json
-import os
 
-# Configuração da página
+# Configuração da página do Streamlit
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
 
-# Configuração do Gemini puxando a chave dos Secrets do Streamlit
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+# Inicializa o novo cliente oficial do Google (Lê o GEMINI_API_KEY dos Secrets automaticamente)
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Textos Iniciais
+# Textos Iniciais da Interface
 st.title("📰 CORTINA DE FUMAÇA")
 st.write("Nem tudo que domina sua timeline é o que mais impacta sua vida.")
 
-# Variáveis para guardar o estado da tela
+# Variáveis de estado para controlar o clique do botão
 if "dados_prontos" not in st.session_state:
     st.session_state.dados_prontos = False
     st.session_state.resultado = {}
 
 # O Botão Principal
 if st.button("Descobrir o que bombou esta semana"):
-    with st.spinner("Analisando algoritmos e coletando dados da semana..."):
+    with st.spinner("O Gemini está navegando na Web e analisando os algoritmos desta semana..."):
         try:
-            ddgs = DDGS()
+            # Criamos o prompt dizendo exatamente o que queremos coletar na internet
+            prompt = """
+            Faça uma pesquisa na web sobre o cenário atual do Brasil nesta semana corrente de junho de 2026.
             
-            # Buscando as notícias e fofocas dos últimos dias no Brasil
-            fofocas_brutas = ddgs.news("famosos OR fofoca OR celebridades OR viralizou", region="br-pt", timelimit="w", max_results=10)
-            serias_brutas = ddgs.news("projeto de lei OR senado OR stf OR câmara OR impacto", region="br-pt", timelimit="w", max_results=10)
+            Selecione e organize:
+            1. As 5 maiores fofocas, polêmicas de celebridades ou assuntos de entretenimento que mais geraram engajamento e cliques.
+            2. De 3 a 5 notícias sérias (como projetos de lei no Congresso, votações, decisões do STF, economia ou pautas sociais) que aconteceram no mesmo período.
             
-            lista_fofocas = [{"titulo": r.get('title', ''), "link": r.get('url', ''), "resumo": r.get('body', '')} for r in fofocas_brutas]
-            lista_serias = [{"titulo": r.get('title', ''), "link": r.get('url', ''), "resumo": r.get('body', '')} for r in serias_brutas]
-            
-            prompt = f"""
-            Você é um curador de dados para um projeto de educação midiática. 
-            Com base EXCLUSIVAMENTE nas listas de notícias reais abaixo, selecione as 5 fofocas de entretenimento e as 3 notícias políticas/sociais mais impactantes.
-            
-            FOFOCAS REAIS DA SEMANA: {lista_fofocas}
-            NOTÍCIAS SÉRIAS DA SEMANA: {lista_serias}
+            Você deve retornar estritamente um código JSON estruturado usando esta formatação exata:
+            {
+              "fofocas": [ {"titulo": "Manchete da fofoca", "link": "URL real da fonte encontrada", "resumo": "Explicação curta do motivo de ter viralizado"} ],
+              "serias": [ {"titulo": "Manchete séria", "link": "URL real da fonte encontrada", "resumo": "Explicação curta do impacto real"} ]
+            }
+            Não insira nenhuma introdução, saudação ou bloco de texto markdown fora do JSON.
             """
-            
-            # Instanciando o modelo Gemini Flash (rápido e gratuito)
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            
-            # Pedindo para o Gemini responder estritamente em JSON usando o Schema esperado
-            resposta = model.generate_content(
-                prompt,
-                generation_config=genai.GenerationConfig(
-                    response_mime_type="application/json",
-                    response_schema={
-                        "type": "object",
-                        "properties": {
-                            "fofocas": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "titulo": {"type": "string"},
-                                        "link": {"type": "string"},
-                                        "resumo": {"type": "string"}
-                                    }
-                                }
-                            },
-                            "serias": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "titulo": {"type": "string"},
-                                        "link": {"type": "string"},
-                                        "resumo": {"type": "string"}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                )
+
+            # Chamada do modelo usando a nova biblioteca padrão de 2026
+            # Habilitamos a ferramenta 'google_search' para ele buscar na web em tempo real
+            resposta = client.models.generate_content(
+                model='gemini-1.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[{"google_search": {}}],  # Ativa a busca nativa do Google!
+                    response_mime_type="application/json",  # Garante o retorno estruturado
+                ),
             )
             
-            # Transformando o texto da resposta em um dicionário Python
-            st.session_state.resultado = json.loads(resposta.text)
+            # Limpeza rápida para garantir que pegamos apenas o objeto JSON
+            texto_resposta = resposta.text.strip()
+            if texto_resposta.startswith("```"):
+                texto_resposta = texto_resposta.replace("
+```json", "").replace("```", "").strip()
+
+            st.session_state.resultado = json.loads(texto_resposta)
             st.session_state.dados_prontos = True
 
         except Exception as e:
-            st.error("Poxa, os servidores de busca demoraram para responder ou houve uma falha de conexão. Tente clicar no botão novamente!")
+            st.error("Houve uma falha ao estruturar os dados da pesquisa de mídia. Tente clicar no botão novamente.")
             st.caption(f"Detalhe técnico: {e}")
 
 st.write("---")
 
-# Mostrando os resultados na tela
+# Exibição dinâmica dos resultados coletados
 if st.session_state.dados_prontos and "fofocas" in st.session_state.resultado:
     st.subheader("🔥 Top assuntos da semana")
+    st.caption("Clique em uma fofoca para ver como os algoritmos disputaram sua atenção:")
     
-    for fofoca in st.session_state.resultado["fofocas"]:
-        
-        # O botão revela as notícias sérias
-        if st.button(f"👉 {fofoca['titulo']}"):
+    for idx, fofoca in enumerate(st.session_state.resultado["fofocas"]):
+        # Chave única para cada botão gerado no loop
+        if st.button(f"👉 {fofoca['titulo']}", key=f"btn_fofoca_{idx}"):
             
             st.markdown(f"**Por que bombou?** {fofoca['resumo']}")
             st.markdown(f"[🔗 Ver fonte da fofoca]({fofoca['link']})")
@@ -103,7 +79,6 @@ if st.session_state.dados_prontos and "fofocas" in st.session_state.resultado:
             st.write("---")
             st.subheader("🌫️ Enquanto isso, na mesma semana...")
             
-            # Percorre as notícias sérias capturadas
             for seria in st.session_state.resultado.get("serias", []):
                 st.markdown(f"**{seria['titulo']}**")
                 st.markdown(f"{seria['resumo']}")
