@@ -40,8 +40,9 @@ if st.button("Descobrir o que bombou esta semana"):
 
             # Chamada do modelo usando a nova biblioteca padrão de 2026
             # Habilitamos a ferramenta 'google_search' para ele buscar na web em tempo real
+          # Chamada do modelo usando a nova biblioteca e a versão atualizada da IA
             resposta = client.models.generate_content(
-                model='gemini-1.5-flash',
+                model='gemini-2.0-flash', # <--- A ÚNICA MUDANÇA É AQUI
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     tools=[{"google_search": {}}],  # Ativa a busca nativa do Google!
