@@ -1,19 +1,13 @@
 import streamlit as st
 from groq import Groq
-import requests
-from datetime import datetime, timedelta
+from datetime import datetime
+import json
 
-# ── Configuração da página ──────────────────────────────────────────────────
-st.set_page_config(
-    page_title="Cortina de Fumaça",
-    page_icon="🔍",
-    layout="centered",
-)
+st.set_page_config(page_title="Cortina de Fumaça", page_icon="🔍", layout="centered")
 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap');
-
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
         background-color: #0d0d0d;
@@ -21,107 +15,82 @@ st.markdown("""
     }
     h1 { font-family: 'Playfair Display', serif; font-size: 2.6rem; color: #e8e8e0; }
     h2, h3 { font-family: 'Playfair Display', serif; color: #e8e8e0; }
-    .stTextInput > div > div > input {
-        background: #1a1a1a;
-        border: 1px solid #333;
-        color: #e8e8e0;
-        border-radius: 8px;
-    }
     .stButton > button {
-        background: #c0392b;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 0.6rem 2rem;
-        transition: background 0.2s;
+        background: #c0392b; color: white; border: none;
+        border-radius: 8px; font-weight: 600; padding: 0.6rem 2rem;
     }
     .stButton > button:hover { background: #e74c3c; }
     .card {
-        background: #1a1a1a;
-        border-left: 4px solid #c0392b;
-        border-radius: 8px;
-        padding: 1.2rem 1.5rem;
-        margin: 1rem 0;
+        background: #1a1a1a; border-left: 4px solid #c0392b;
+        border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1rem 0;
     }
     .tag {
-        display: inline-block;
-        background: #2d2d2d;
-        color: #aaa;
-        font-size: 0.75rem;
-        padding: 2px 10px;
-        border-radius: 20px;
-        margin-bottom: 0.5rem;
+        display: inline-block; background: #2d2d2d; color: #aaa;
+        font-size: 0.75rem; padding: 2px 10px; border-radius: 20px; margin-bottom: 0.5rem;
     }
     .question-box {
-        background: #161616;
-        border: 1px solid #c0392b44;
-        border-radius: 10px;
-        padding: 1.2rem 1.5rem;
-        margin-top: 1.5rem;
-        font-style: italic;
-        color: #ccc;
+        background: #161616; border: 1px solid #c0392b44;
+        border-radius: 10px; padding: 1.2rem 1.5rem;
+        margin-top: 1.5rem; font-style: italic; color: #ccc;
     }
     hr { border-color: #222; }
+    .stTextInput > div > div > input {
+        background: #1a1a1a; border: 1px solid #333; color: #e8e8e0; border-radius: 8px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Cabeçalho ───────────────────────────────────────────────────────────────
+groq_key = st.secrets.get("GROQ_KEY", "")
+if not groq_key:
+    st.error("Chave GROQ_KEY não encontrada nos Secrets do Streamlit.")
+    st.stop()
+
+client = Groq(api_key=groq_key)
+
 st.markdown("# 🔍 Cortina de Fumaça")
 st.markdown("*Qual notícia está monopolizando sua atenção — e o que pode estar ficando de fora?*")
 st.divider()
 
-# ── Carrega chaves do secrets.toml (nunca expostas na interface) ─────────────
-groq_key = st.secrets.get("GROQ_KEY", "")
-news_key = st.secrets.get("NEWS_KEY", "")
-
-if not groq_key:
-    st.error("⚠️ Chave Groq não encontrada. Configure GROQ_KEY no arquivo .streamlit/secrets.toml ou nos Secrets do Streamlit Cloud.")
-    st.stop()
-
-# ── Sidebar: apenas info do projeto ─────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### ℹ️ Sobre o projeto")
+    st.markdown("### ℹ️ Sobre")
     st.caption("Ferramenta de educação midiática. Não acusa ninguém — apenas estimula reflexão crítica sobre como nossa atenção é direcionada.")
-    st.divider()
-    if news_key:
-        st.success("✅ NewsAPI conectada")
-    else:
-        st.info("NewsAPI não configurada — use o modo manual.")
 
-# ── Funções ──────────────────────────────────────────────────────────────────
-def buscar_noticias_em_alta(api_key: str) -> list[dict]:
-    """Busca as notícias mais populares da semana via NewsAPI."""
-    ontem = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-    url = (
-        f"https://newsapi.org/v2/top-headlines"
-        f"?language=pt&pageSize=10&sortBy=popularity&apiKey={api_key}"
+def buscar_noticias_quentes() -> list[str]:
+    hoje = datetime.now().strftime("%d/%m/%Y")
+    prompt = f"""Hoje é {hoje}. Liste as 8 notícias ou temas que estão mais em alta no Brasil AGORA — 
+coisas que as pessoas estão comentando nas redes sociais, nos grupos de WhatsApp e nas manchetes.
+Pode ser política, celebridade, esporte, economia, tragédia, meme viral, qualquer coisa real.
+Seja específico: nomes, acontecimentos concretos.
+
+Responda APENAS com um JSON assim, sem texto antes ou depois:
+{{"noticias": ["notícia 1", "notícia 2", "notícia 3", "notícia 4", "notícia 5", "notícia 6", "notícia 7", "notícia 8"]}}"""
+
+    r = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.6,
+        max_tokens=500,
     )
-    try:
-        r = requests.get(url, timeout=8)
-        data = r.json()
-        if data.get("status") == "ok":
-            return data.get("articles", [])
-    except Exception:
-        pass
-    return []
+    raw = r.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    data = json.loads(raw.strip())
+    return data["noticias"]
 
-def analisar_cortina(client: Groq, tema_quente: str, tema_manual: bool) -> dict:
-    """Pede ao Groq para identificar a cortina de fumaça."""
-    if tema_manual:
-        contexto = f"O usuário informou que o tema mais comentado na mídia esta semana é: '{tema_quente}'."
-    else:
-        contexto = f"O tema que está dominando as manchetes brasileiras esta semana é: '{tema_quente}'."
-
-    prompt = f"""Você é um analista de mídia crítico e educador. {contexto}
+def analisar_cortina(tema: str) -> dict:
+    hoje = datetime.now().strftime("%d/%m/%Y")
+    prompt = f"""Você é um analista de mídia crítico e educador. Hoje é {hoje}.
+O tema que está dominando as manchetes e redes sociais é: '{tema}'.
 
 Sua tarefa:
-1. Confirme se esse tema realmente está recebendo atenção desproporcional na mídia.
-2. Identifique 2 a 3 ASSUNTOS REAIS E CONCRETOS que estão acontecendo AGORA (semana de {datetime.now().strftime('%d/%m/%Y')}) e que podem estar sendo ofuscados por esse tema dominante. Seja específico: nomes de projetos de lei, países, crises, votações, escândalos reais. Não invente — se não souber, diga que são possibilidades plausíveis.
-3. Explique, com base em como a mídia e os algoritmos funcionam, por que essa dinâmica pode ser considerada uma possível "cortina de fumaça" — sem acusar intenção, apenas analisando o efeito.
-4. Termine com UMA pergunta aberta provocativa para o leitor refletir.
+1. Explique brevemente por que esse tema está recebendo tanta atenção agora.
+2. Identifique 2 ou 3 assuntos REAIS e CONCRETOS que estão acontecendo nesta semana e que podem estar sendo ofuscados por esse tema dominante. Seja específico: projetos de lei, crises, votações, escândalos, acontecimentos internacionais. Se não tiver certeza, indique como "possível".
+3. Explique, com base em como mídia e algoritmos funcionam, por que essa dinâmica pode ser considerada uma possível "cortina de fumaça" — sem acusar intenção, apenas analisando o efeito.
+4. Faça UMA pergunta aberta e provocativa para o leitor refletir.
 
-Responda em JSON com exatamente estas chaves:
+Responda APENAS com este JSON, sem texto antes ou depois:
 {{
   "tema_dominante": "...",
   "porque_domina": "...",
@@ -131,64 +100,54 @@ Responda em JSON com exatamente estas chaves:
   ],
   "analise_cortina": "...",
   "pergunta_reflexao": "..."
-}}
-Responda APENAS com o JSON, sem texto antes ou depois."""
+}}"""
 
-    response = client.chat.completions.create(
+    r = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
         max_tokens=1200,
     )
-    import json
-    raw = response.choices[0].message.content.strip()
-    # remove possíveis ```json ... ```
+    raw = r.choices[0].message.content.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
             raw = raw[4:]
     return json.loads(raw.strip())
 
-# ── Interface principal ───────────────────────────────────────────────────────
+# ── Interface ────────────────────────────────────────────────────────────────
 modo = st.radio(
-    "Como você quer começar?",
-    ["🔎 Buscar notícias automaticamente (NewsAPI)", "✏️ Informar o tema manualmente"],
+    "Como quer começar?",
+    ["🔥 Ver o que está bombando agora", "✏️ Digitar o tema manualmente"],
     horizontal=True,
 )
 
 tema_escolhido = None
 
-if modo == "🔎 Buscar notícias automaticamente (NewsAPI)":
-    if not news_key:
-        st.info("Insira sua chave da NewsAPI na barra lateral para busca automática.")
-    else:
-        if st.button("Buscar notícias da semana"):
-            with st.spinner("Buscando manchetes..."):
-                artigos = buscar_noticias_em_alta(news_key)
-            if artigos:
-                titulos = [a["title"] for a in artigos if a.get("title")]
-                st.markdown("**Selecione a notícia que parece dominar sua timeline:**")
-                tema_escolhido = st.selectbox("", titulos)
-            else:
-                st.error("Não foi possível buscar notícias. Verifique sua chave NewsAPI.")
+if modo == "🔥 Ver o que está bombando agora":
+    if st.button("Buscar o que está em alta"):
+        with st.spinner("Vendo o que o Brasil está comentando..."):
+            try:
+                noticias = buscar_noticias_quentes()
+                st.session_state["noticias"] = noticias
+            except Exception as e:
+                st.error(f"Erro ao buscar notícias: {e}")
+
+    if "noticias" in st.session_state:
+        st.markdown("**Selecione o tema que parece dominar sua timeline:**")
+        tema_escolhido = st.selectbox("", st.session_state["noticias"])
 
 else:
     tema_escolhido = st.text_input(
         "Qual assunto está dominando as notícias agora?",
-        placeholder="Ex: escândalo político, morte de celebridade, copa do mundo...",
+        placeholder="Ex: impeachment, morte de famoso, Copa do Mundo...",
     )
 
-# ── Análise ───────────────────────────────────────────────────────────────────
 if tema_escolhido:
     if st.button("🔍 Analisar cortina de fumaça"):
         with st.spinner("Analisando padrões de atenção midiática..."):
             try:
-                client = Groq(api_key=groq_key)
-                resultado = analisar_cortina(
-                    client,
-                    tema_escolhido,
-                    tema_manual=(modo != "🔎 Buscar notícias automaticamente (NewsAPI)"),
-                )
+                resultado = analisar_cortina(tema_escolhido)
 
                 st.divider()
                 st.markdown("## 📡 Tema em destaque")
@@ -204,7 +163,7 @@ if tema_escolhido:
                 st.markdown("## 💭 Para você refletir")
                 st.markdown(f'<div class="question-box">❝ {resultado["pergunta_reflexao"]} ❞</div>', unsafe_allow_html=True)
 
-                st.caption("⚠️ Esta análise é gerada por IA e tem fins educativos. Não representa acusações ou verdades absolutas — é um convite ao pensamento crítico.")
+                st.caption("⚠️ Análise gerada por IA com fins educativos. Não representa acusações ou verdades absolutas — é um convite ao pensamento crítico.")
 
             except Exception as e:
                 st.error(f"Erro na análise: {e}")
