@@ -56,9 +56,9 @@ if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando a atenção da internet..."):
         try:
             # Termos muito mais focados no puro suco da fofoca brasileira
-            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado OR flagra", max_itens=12)
+            fofocas_brutas = buscar_no_google_news("fofoca OR polêmica OR traição OR cancelado OR babado OR flagra", max_itens=8)
             # Focando nas burocracias de alto impacto
-            serias_brutas = buscar_no_google_news("Politica OR investigação OR senado OR stf OR pec", max_itens=12)
+            serias_brutas = buscar_no_google_news("Politica OR investigação OR senado OR stf OR pec", max_itens=8)
             
             if not fofocas_brutas or not serias_brutas:
                 st.error("O buscador falhou na coleta de dados. Tente novamente.")
@@ -93,7 +93,7 @@ if st.button("Descobrir os assuntos da semana"):
                     {"role": "system", "content": "Você atua como um filtro editorial. Retorne apenas JSON."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.3, # Um pouco mais de liberdade para a IA escolher os melhores
+                temperature=0.3, 
                 response_format={"type": "json_object"}
             )
             
@@ -106,50 +106,5 @@ if st.button("Descobrir os assuntos da semana"):
 
         except Exception as e:
             st.error("Ops! Tivemos um engasgo na conexão com os dados. Clique no botão mais uma vez!")
-
-st.write("---")
-
-if st.session_state.dados_prontos and "pares" in st.session_state.resultado:
-    st.subheader("🔥 Assuntos em alta da semana")
-    
-    lista_pares = st.session_state.resultado.get("pares", [])
-    
-    # Se a IA não achar nem 1, avisamos
-    if not lista_pares:
-        st.warning("Não encontramos polêmicas boas o suficiente nesta semana. Tente novamente!")
-    
-    for idx, par in enumerate(lista_pares):
-        fofoca = par.get("fofoca")
-        seria = par.get("seria")
-        
-        if not fofoca or not seria:
-            continue
-            
-        titulo_f = fofoca.get('titulo', 'Assunto em alta')
-        data_f = fofoca.get('data_formatada', 'Nesta semana')
-        veiculo_f = fofoca.get('veiculo', 'Internet')
-        resumo_f = fofoca.get('resumo', 'Viralizou nas redes.')
-        link_f = fofoca.get('link', '#')
-
-        titulo_s = seria.get('titulo', 'Notícia importante')
-        data_s = seria.get('data_formatada', 'Nesta semana')
-        veiculo_s = seria.get('veiculo', 'Portal de Notícias')
-        resumo_s = seria.get('resumo', 'Impacto na sociedade.')
-        link_s = seria.get('link', '#')
-        
-        if st.button(f"👉 {titulo_f}", key=f"btn_fofoca_{idx}"):
-            
-            st.markdown(f"📅 *{data_f}* | 📰 **Fonte:** {veiculo_f}")
-            st.markdown(f"**Por que bombou?** {resumo_f}")
-            st.markdown(f"[🔗 Ver na fonte]({link_f})")
-            
-            st.write("---")
-            
-            st.subheader("🌫️ Enquanto isso, na mesma época...")
-            st.markdown(f"📅 *{data_s}* | 📰 **Fonte:** {veiculo_s}")
-            st.markdown(f"**{titulo_s}**")
-            st.markdown(f"{resumo_s}")
-            st.markdown(f"[🔗 Ler a notícia]({link_s})")
-            
-            st.write("---")
-            st.info("💭 **Para pensar:** Como as plataformas direcionam a sua atenção? A mídia não escondeu essa notícia séria, mas os algoritmos priorizaram o engajamento do entretenimento.")
+            # VOLTEI COM ESSA LINHA PARA A GENTE VER O ERRO SE ELE ACONTECER:
+            st.caption(f"Detalhe técnico: {e}")
