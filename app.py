@@ -31,10 +31,12 @@ if st.button("Descobrir o que bombou esta semana"):
         # Transformando a busca em um formato que a IA entenda
         textos_encontrados = f"FOFOCAS: {list(busca_fofoca)}\n\nSÉRIAS: {list(busca_seria)}"
         
-        # Pedindo para a Groq organizar isso de forma simples
+        # Transformando a busca em um formato que a IA entenda
+        textos_encontrados = f"FOFOCAS: {list(busca_fofoca)}\n\nSÉRIAS: {list(busca_seria)}"
+        
         prompt = f"""
         Leia as notícias reais abaixo e escolha 5 fofocas e 3 notícias sérias.
-        Retorne APENAS um JSON válido neste formato exato, sem mais nenhum texto:
+        Siga este formato exato usando as chaves "fofocas" e "serias":
         {{"fofocas": [{{"titulo": "T", "link": "L", "resumo": "R"}}], "serias": [{{"titulo": "T", "link": "L", "resumo": "R"}}]}}
         
         NOTÍCIAS REAIS ENCONTRADAS NA BUSCA:
@@ -43,7 +45,11 @@ if st.button("Descobrir o que bombou esta semana"):
         
         resposta = client.chat.completions.create(
             model="llama3-8b-8192",
-            messages=[{"role": "user", "content": prompt}],
+            messages=[
+                # A Groq exige que essa regra fique isolada no "system"
+                {"role": "system", "content": "Você é um assistente de curadoria de dados. Você deve retornar APENAS um JSON válido."},
+                {"role": "user", "content": prompt}
+            ],
             temperature=0.3,
             response_format={"type": "json_object"}
         )
