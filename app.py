@@ -117,23 +117,44 @@ st.write("---")
 if st.session_state.dados_prontos and "pares" in st.session_state.resultado:
     st.subheader("🔥 Top 5 assuntos da semana")
     
-    for idx, par in enumerate(st.session_state.resultado["pares"]):
-        fofoca = par["fofoca"]
-        seria = par["seria"]
+    # Pegamos a lista de pares com segurança
+    lista_pares = st.session_state.resultado.get("pares", [])
+    
+    for idx, par in enumerate(lista_pares):
+        # O .get() puxa a informação. Se a IA esqueceu de gerar, ele devolve "None" em vez de quebrar o site
+        fofoca = par.get("fofoca")
+        seria = par.get("seria")
         
-        if st.button(f"{idx + 1}º 👉 {fofoca['titulo']}", key=f"btn_fofoca_{idx}"):
+        # TRAVA DE SEGURANÇA: Se a IA entregou um par pela metade, a gente ignora e vai pro próximo
+        if not fofoca or not seria:
+            continue
             
-            st.markdown(f"📅 *{fofoca['data_formatada']}* | 📰 **Fonte:** {fofoca['veiculo']}")
-            st.markdown(f"**Por que bombou?** {fofoca['resumo']}")
-            st.markdown(f"[🔗 Ver na fonte]({fofoca['link']})")
+        # Puxamos os dados internos também com segurança para evitar qualquer outro KeyError
+        titulo_f = fofoca.get('titulo', 'Assunto em alta')
+        data_f = fofoca.get('data_formatada', 'Nesta semana')
+        veiculo_f = fofoca.get('veiculo', 'Internet')
+        resumo_f = fofoca.get('resumo', 'Viralizou nas redes.')
+        link_f = fofoca.get('link', '#')
+
+        titulo_s = seria.get('titulo', 'Notícia importante')
+        data_s = seria.get('data_formatada', 'Nesta semana')
+        veiculo_s = seria.get('veiculo', 'Portal de Notícias')
+        resumo_s = seria.get('resumo', 'Impacto na sociedade.')
+        link_s = seria.get('link', '#')
+        
+        if st.button(f"{idx + 1}º 👉 {titulo_f}", key=f"btn_fofoca_{idx}"):
+            
+            st.markdown(f"📅 *{data_f}* | 📰 **Fonte:** {veiculo_f}")
+            st.markdown(f"**Por que bombou?** {resumo_f}")
+            st.markdown(f"[🔗 Ver na fonte]({link_f})")
             
             st.write("---")
             
             st.subheader("🌫️ Enquanto isso, na mesma época...")
-            st.markdown(f"📅 *{seria['data_formatada']}* | 📰 **Fonte:** {seria['veiculo']}")
-            st.markdown(f"**{seria['titulo']}**")
-            st.markdown(f"{seria['resumo']}")
-            st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
+            st.markdown(f"📅 *{data_s}* | 📰 **Fonte:** {veiculo_s}")
+            st.markdown(f"**{titulo_s}**")
+            st.markdown(f"{resumo_s}")
+            st.markdown(f"[🔗 Ler a notícia]({link_s})")
             
             st.write("---")
             st.info("💭 **Para pensar:** Como as plataformas direcionam a sua atenção? A mídia não escondeu essa notícia séria, mas os algoritmos priorizaram o engajamento do entretenimento.")
