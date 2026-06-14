@@ -75,8 +75,7 @@ if st.button("Descobrir o que bombou esta semana"):
             
             texto_limpo = resposta.choices[0].message.content.strip()
             if texto_limpo.startswith("```"):
-                texto_limpo = texto_limpo.replace("
-```json", "").replace("```", "").strip()
+                texto_limpo = texto_limpo.replace("```json", "").replace("```", "").strip()
                 
             st.session_state.resultado = json.loads(texto_limpo)
             st.session_state.dados_prontos = True
