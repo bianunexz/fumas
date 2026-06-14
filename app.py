@@ -1,19 +1,22 @@
 import streamlit as st
 from groq import Groq
 import urllib.request
+import urllib.parse
 import xml.etree.ElementTree as ET
-import re
 import json
 
 # Configuração da página
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
-client = Groq() # Ele vai puxar a GROQ_API_KEY que já está lá nos seus Secrets!
+client = Groq()
 
-# Função que lê as notícias direto da fonte oficial, sem depender de buscadores
-def buscar_noticias_g1(url_rss, max_itens=10):
+# Função que pesquisa DIRETAMENTE no Google Notícias (Múltiplas fontes, sem bloqueio)
+def buscar_no_google_news(termo_busca, max_itens=15):
     try:
-        # Finge ser um navegador normal para o site não bloquear
-        req = urllib.request.Request(url_rss, headers={'User-Agent': 'Mozilla/5.0'})
+        # Codifica a busca e força o filtro "when:7d" (apenas da última semana)
+        termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
+        url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+        
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req) as response:
             xml_data = response.read()
             
@@ -21,14 +24,26 @@ def buscar_noticias_g1(url_rss, max_itens=10):
         noticias = []
         
         for item in root.findall('.//item')[:max_itens]:
-            titulo = item.find('title').text
+            titulo_completo = item.find('title').text
+            
+            # O Google Notícias coloca o nome do site no final do título (ex: "Manchete - Folha de S.Paulo")
+            # Aqui nós separamos a manchete do nome do veículo
+            if ' - ' in titulo_completo:
+                titulo = titulo_completo.rsplit(' - ', 1)[0]
+                veiculo = titulo_completo.rsplit(' - ', 1)[-1]
+            else:
+                titulo = titulo_completo
+                veiculo = "Portal de Notícias"
+                
             link = item.find('link').text
-            descricao_bruta = item.find('description').text if item.find('description') is not None else ""
+            data_pub = item.find('pubDate').text
             
-            # Limpa qualquer sujeira de código HTML que venha no texto
-            descricao_limpa = re.sub('<[^<]+>', '', descricao_bruta).strip()
-            
-            noticias.append({"titulo": titulo, "link": link, "resumo": descricao_limpa[:150]})
+            noticias.append({
+                "titulo": titulo, 
+                "veiculo": veiculo,
+                "link": link, 
+                "data": data_pub
+            })
             
         return noticias
     except Exception as e:
@@ -43,31 +58,39 @@ if "dados_prontos" not in st.session_state:
     st.session_state.resultado = {}
 
 if st.button("Descobrir o que bombou esta semana"):
-    with st.spinner("Lendo feeds de notícias e analisando o peso dos algoritmos..."):
+    with st.spinner("Pesquisando no Google e mapeando o ecossistema de notícias..."):
         try:
-            # Puxa dados REAIS e instantâneos do RSS do G1
-            fofocas_brutas = buscar_noticias_g1('https://g1.globo.com/rss/g1/pop-arte/')
-            serias_brutas = buscar_noticias_g1('https://g1.globo.com/rss/g1/politica/')
+            # Fazemos as duas buscas no Google Notícias
+            fofocas_brutas = buscar_no_google_news("famosos OR celebridades OR fofoca OR reality OR viralizou")
+            serias_brutas = buscar_no_google_news("projeto de lei OR senado OR congresso OR impacto economico OR STF")
             
             prompt = f"""
-            Você é um curador de dados. 
-            Com base EXCLUSIVAMENTE nestas notícias reais do Brasil capturadas agora, selecione 5 fofocas/entretenimento e 3 notícias sérias de política.
+            Você é um curador rigoroso de dados para um projeto de pesquisa acadêmica em comunicação.
+            Sua tarefa é ler os resultados do Google abaixo e criar 4 PARES ÚNICOS de notícias.
             
-            Retorne APENAS um JSON válido nesta estrutura:
+            REGRAS RÍGIDAS (PUNIÇÃO SE DESCUMPRIR):
+            1. FOFOCAS: Escolha APENAS entretenimento, memes, polêmicas de famosos ou moda. PROIBIDO usar tragédias, mortes ou acidentes.
+            2. NOTÍCIAS SÉRIAS: Escolha APENAS leis, STF, congresso, economia ou pautas sociais. PROIBIDO esportes.
+            3. EMPARELHAMENTO: Case 1 fofoca com 1 notícia séria diferente. NENHUMA notícia pode se repetir.
+            
+            Retorne APENAS um JSON válido nesta estrutura exata:
             {{
-              "fofocas": [ {{"titulo": "T", "link": "L", "resumo": "R"}} ],
-              "serias": [ {{"titulo": "T", "link": "L", "resumo": "R"}} ]
+              "pares": [
+                {{
+                  "fofoca": {{"titulo": "T", "veiculo": "V", "link": "L", "resumo": "Por que viralizou?", "data_formatada": "Ex: 14 Junho"}},
+                  "seria": {{"titulo": "T", "veiculo": "V", "link": "L", "resumo": "Qual o impacto real?", "data_formatada": "Ex: 14 Junho"}}
+                }}
+              ]
             }}
             
-            FOFOCAS: {fofocas_brutas}
-            SÉRIAS: {serias_brutas}
+            RESULTADOS DO GOOGLE - FOFOCAS: {fofocas_brutas}
+            RESULTADOS DO GOOGLE - SÉRIAS: {serias_brutas}
             """
             
-            # Voltamos para o modelo da Groq que tinha funcionado perfeitamente
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[
-                    {"role": "system", "content": "Você só responde em formato JSON estruturado."},
+                    {"role": "system", "content": "Você atua como um filtro editorial rígido. Retorne apenas JSON."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.1
@@ -75,7 +98,8 @@ if st.button("Descobrir o que bombou esta semana"):
             
             texto_limpo = resposta.choices[0].message.content.strip()
             if texto_limpo.startswith("```"):
-                texto_limpo = texto_limpo.replace("```json", "").replace("```", "").strip()
+                texto_limpo = texto_limpo.replace("
+```json", "").replace("```", "").strip()
                 
             st.session_state.resultado = json.loads(texto_limpo)
             st.session_state.dados_prontos = True
@@ -86,24 +110,27 @@ if st.button("Descobrir o que bombou esta semana"):
 
 st.write("---")
 
-# Renderiza os dados
-if st.session_state.dados_prontos and "fofocas" in st.session_state.resultado:
+# Renderiza os dados no formato de pares
+if st.session_state.dados_prontos and "pares" in st.session_state.resultado:
     st.subheader("🔥 Top assuntos da semana")
     
-    for fofoca in st.session_state.resultado["fofocas"]:
-        if st.button(f"👉 {fofoca['titulo']}"):
+    for idx, par in enumerate(st.session_state.resultado["pares"]):
+        fofoca = par["fofoca"]
+        seria = par["seria"]
+        
+        if st.button(f"👉 {fofoca['titulo']}", key=f"btn_fofoca_{idx}"):
             
-            st.markdown(f"**Por que bombou?** {fofoca['resumo']}...")
-            st.markdown(f"[🔗 Ver fonte da fofoca]({fofoca['link']})")
-            
-            st.write("---")
-            st.subheader("🌫️ Enquanto isso, na mesma semana...")
-            
-            for seria in st.session_state.resultado.get("serias", []):
-                st.markdown(f"**{seria['titulo']}**")
-                st.markdown(f"{seria['resumo']}...")
-                st.markdown(f"[🔗 Ler a notícia completa]({seria['link']})")
-                st.write("")
+            st.markdown(f"📅 *{fofoca['data_formatada']}* | 📰 **Fonte:** {fofoca['veiculo']}")
+            st.markdown(f"**Por que bombou?** {fofoca['resumo']}")
+            st.markdown(f"[🔗 Ver na fonte]({fofoca['link']})")
             
             st.write("---")
-            st.info("💭 **Para pensar:** Como as plataformas direcionam a sua atenção? A mídia não escondeu essas notícias sérias, mas os algoritmos priorizaram o engajamento da fofoca.")
+            
+            st.subheader("🌫️ Enquanto isso, na mesma época...")
+            st.markdown(f"📅 *{seria['data_formatada']}* | 📰 **Fonte:** {seria['veiculo']}")
+            st.markdown(f"**{seria['titulo']}**")
+            st.markdown(f"{seria['resumo']}")
+            st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
+            
+            st.write("---")
+            st.info("💭 **Para pensar:** Como as plataformas direcionam a sua atenção? A mídia não escondeu essa notícia séria, mas os algoritmos priorizaram o engajamento do entretenimento.")
