@@ -7,14 +7,14 @@ import json
 from email.utils import parsedate_to_datetime
 import random
 
-# 1. Configurações
+# ── Config ────────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
 client = Groq()
 
 def formatar_data(data_rss):
     try:
         dt = parsedate_to_datetime(data_rss)
-        meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+        meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
         return f"{dt.day} de {meses[dt.month - 1]}"
     except:
         return "Nesta semana"
@@ -23,104 +23,133 @@ def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20):
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
         url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419&num=20"
-        
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
-        
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req) as response:
             xml_data = response.read()
-            
         root = ET.fromstring(xml_data)
-        itens = root.findall('.//item')
+        itens = root.findall(".//item")
         amostra = random.sample(itens, min(len(itens), max_itens))
-        
         noticias = []
         for i, item in enumerate(amostra):
-            titulo_completo = item.find('title').text
-            if ' - ' in titulo_completo:
-                titulo = titulo_completo.rsplit(' - ', 1)[0]
-                veiculo = titulo_completo.rsplit(' - ', 1)[-1]
+            titulo_completo = item.find("title").text
+            if " - " in titulo_completo:
+                titulo = titulo_completo.rsplit(" - ", 1)[0]
+                veiculo = titulo_completo.rsplit(" - ", 1)[-1]
             else:
                 titulo = titulo_completo
                 veiculo = "Portal de Notícias"
-                
             noticias.append({
                 "id": f"{prefixo_id}{i}",
                 "titulo": titulo,
                 "veiculo": veiculo,
-                "link": item.find('link').text,
-                "data": formatar_data(item.find('pubDate').text)
+                "link": item.find("link").text,
+                "data": formatar_data(item.find("pubDate").text)
             })
         return noticias
     except:
         return []
 
-# 2. Interface
+# ── Interface ─────────────────────────────────────────────────────────────────
 st.title("📰 CORTINA DE FUMAÇA")
 st.write("Nem tudo que domina sua timeline é o que mais impacta sua vida.")
 
 if "dados_prontos" not in st.session_state:
     st.session_state.dados_prontos = False
-    st.session_state.titulos_exibidos = [] # MEMÓRIA DE EXCLUSÃO
+    st.session_state.titulos_exibidos = []
 
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando o ecossistema de notícias..."):
         try:
-            fofocas_brutas = buscar_no_google_news("briga famosos OR influencer OR virginia OR treta OR reality OR flagra OR fofoca OR celebridade", "F")
-            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S")
-            
+            fofocas_brutas = buscar_no_google_news(
+                "briga famosos OR influencer OR virginia OR treta OR reality OR flagra OR fofoca OR celebridade", "F"
+            )
+            serias_brutas = buscar_no_google_news(
+                "projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S"
+            )
+
             if not fofocas_brutas or not serias_brutas:
                 st.error("O buscador falhou. Tente novamente.")
                 st.stop()
-                
-            st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_brutas}
-            st.session_state.serias_originais = {s["id"]: s for s in serias_brutas}
-            
-            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"]} for f in fofocas_brutas]
-            serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
-            
-            prompt = f"""
-            Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
-            
-            REGRAS DE OURO:
-            1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
-            
-            2. RESUMO DA FOFOCA: Use um tom ácido, informal e cínico. Destaque como o sensacionalismo foi construído para prender a atenção não so repita o titulo da noticia.
 
-            3. RESUMO SÉRIO: Explique a notícia política de forma clara, focando no impacto real dela na vida da pessoas não so repita o titulo da noticia.
-            
-            4. PERGUNTA REFLEXIVA: A pergunta deve questionar a ALOCAÇÃO DA ATENÇÃO. Não confronte o usuário sobre "qual é mais importante" (pois isso é subjetivo), mas pergunte sobre o porquê do algoritmo priorizar o apelo emocional da fofoca em detrimento da notícia pública. 
-            Exemplo: 'O algoritmo prioriza as figuras públicas em vez de mudanças nas leis trabalhistas por que isso gera mais cliques imediatos. Como essa dinâmica molda o que você sabe sobre o país?'
-            
-            Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria, pergunta_reflexiva.
-            Dados: {fofocas_dieta} | {serias_dieta}
-            """
-            
+            st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_brutas}
+            st.session_state.serias_originais  = {s["id"]: s for s in serias_brutas}
+
+            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"]} for f in fofocas_brutas]
+            serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
+
+            ja_exibidos = st.session_state.titulos_exibidos
+
+            prompt = f"""Você é um analista de mídia com escrita direta, ácida e crítica — pense num jornalista cínico comentando as notícias num bar.
+
+Seu trabalho: criar entre 3 e 5 PARES, cada um ligando uma fofoca a uma notícia séria da mesma semana.
+
+FOFOCAS DISPONÍVEIS:
+{json.dumps(fofocas_dieta, ensure_ascii=False)}
+
+NOTÍCIAS SÉRIAS DISPONÍVEIS:
+{json.dumps(serias_dieta, ensure_ascii=False)}
+
+TÍTULOS JÁ EXIBIDOS — não use nenhum destes:
+{json.dumps(ja_exibidos, ensure_ascii=False)}
+
+REGRAS PARA CADA CAMPO:
+
+resumo_fofoca (máx. 2 frases):
+- Tom ácido e informal, como quem está desconstruindo o sensacionalismo
+- Explique O QUE aconteceu E qual mecanismo emocional foi usado para prender atenção (escândalo, inveja, polêmica, identificação)
+- NÃO comece repetindo o título — vá direto ao ponto
+
+resumo_seria (máx. 2 frases):
+- Tom direto e claro, sem juridiquês
+- Explique o que aconteceu, quem é afetado e qual o impacto concreto na vida das pessoas
+- NÃO comece repetindo o título — contextualize
+
+pergunta_reflexiva (1 frase, máx. 25 palavras):
+- Questione a DINÂMICA DOS ALGORITMOS, não o usuário
+- Estrutura: "O algoritmo prioriza X porque Y. Como isso afeta Z?"
+- Proíbido: julgamento moral, "qual é mais importante", retórica óbvia
+- Exemplo bom: "O algoritmo amplifica crises de casais famosos porque geram reengajamento imediato — o que isso diz sobre o que você sabe das leis que regem sua vida?"
+
+Retorne APENAS JSON válido, sem texto antes ou depois:
+{{
+  "pares": [
+    {{
+      "id_fofoca": "...",
+      "resumo_fofoca": "...",
+      "id_seria": "...",
+      "resumo_seria": "...",
+      "pergunta_reflexiva": "..."
+    }}
+  ]
+}}"""
+
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
                 response_format={"type": "json_object"}
             )
-            
+
             st.session_state.resultado = json.loads(resposta.choices[0].message.content)
-            
-            # ATUALIZA A MEMÓRIA COM OS TÍTULOS NOVOS
+
             for par in st.session_state.resultado.get("pares", []):
                 f_obj = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
-                if f_obj: st.session_state.titulos_exibidos.append(f_obj['titulo'])
-            
+                if f_obj:
+                    st.session_state.titulos_exibidos.append(f_obj["titulo"])
+
             st.session_state.dados_prontos = True
+
         except Exception as e:
             st.error(f"Erro ao processar: {e}")
 
-# 3. Exibição
+# ── Exibição ──────────────────────────────────────────────────────────────────
 if st.session_state.get("dados_prontos"):
     st.subheader("🔥 Assuntos em alta da semana")
     for idx, par in enumerate(st.session_state.resultado.get("pares", [])):
         fofoca = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
-        seria = st.session_state.serias_originais.get(par.get("id_seria"))
-        
+        seria  = st.session_state.serias_originais.get(par.get("id_seria"))
+
         if fofoca and seria:
             if st.button(f"👉 {fofoca['titulo']}", key=f"btn_{idx}"):
                 st.markdown(f"📅 *{fofoca['data']}* | 📰 **Fonte:** {fofoca['veiculo']}")
@@ -130,10 +159,8 @@ if st.session_state.get("dados_prontos"):
                 st.subheader("🌫️ Enquanto isso...")
                 st.markdown(f"📅 *{seria['data']}* | 📰 **Fonte:** {seria['veiculo']}")
                 st.markdown(f"**{seria['titulo']}**")
-                st.markdown(f"{par.get('resumo_seria')}")
+                st.markdown(par.get("resumo_seria"))
                 st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
-                
                 st.write("---")
-                # A PERGUNTA QUE VOCÊ QUERIA:
                 st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
                 st.write("---")
