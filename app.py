@@ -163,7 +163,7 @@ if st.session_state.get("dados_prontos"):
                 "data": formatar_data(item.find("pubDate").text)
             })
         return noticias
-        except:
+            except:
         return []
 
 # ── Interface ─────────────────────────────────────────────────────────────────
