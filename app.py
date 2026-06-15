@@ -19,10 +19,10 @@ def formatar_data(data_rss):
     except:
         return "Nesta semana"
 
-def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20):
+def buscar_no_google_news(termo_busca, prefixo_id, max_itens=30): # Aumentado para 30
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
-        url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419&num=20"
+        url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419&num=30"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req) as response:
@@ -61,12 +61,8 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando o ecossistema de notícias..."):
         try:
-            fofocas_brutas = buscar_no_google_news(
-                "fofoca OR treta OR cancelado OR influencer OR flagra OR blogueira OR celebridade OR briga famosos OR ", "F"
-            )
-            serias_brutas = buscar_no_google_news(
-                "projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S"
-            )
+            fofocas_brutas = buscar_no_google_news("fofoca OR treta OR influencer OR virginia OR flagra OR celebridade OR briga famosos", "F")
+            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S")
 
             if not fofocas_brutas or not serias_brutas:
                 st.error("O buscador falhou. Tente novamente.")
@@ -80,54 +76,25 @@ if st.button("Descobrir os assuntos da semana"):
 
             ja_exibidos = st.session_state.titulos_exibidos
 
-            prompt = f"""Você é um analista de mídia com escrita direta, ácida e crítica — pense num jornalista cínico comentando as notícias num bar.
+            prompt = f"""Você é um analista de mídia com escrita direta e crítica.
+            Seu trabalho: criar EXATAMENTE 5 PARES, cada um ligando uma fofoca a uma notícia séria.
 
-Seu trabalho: criar entre 3 e 5 PARES, cada um ligando uma fofoca a uma notícia séria da mesma semana.
+            FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
+            NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
+            TÍTULOS JÁ EXIBIDOS (não use nenhum destes): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
-FOFOCAS DISPONÍVEIS:
-{json.dumps(fofocas_dieta, ensure_ascii=False)}
+            REGRAS PARA CADA CAMPO:
+            resumo_fofoca: Analise o mecanismo de atenção. Por que esse tema viralizou (drama, polêmica, apelo emocional)? Seja analítico, evite moralismo. NÃO repita o título.
+            resumo_seria: Explique a notícia política ou institucional. Foque no impacto prático na vida das pessoas. NÃO repita o título.
+            pergunta_reflexiva: Questione a dinâmica dos algoritmos. Use os nomes específicos dos temas do par. Estrutura: "O algoritmo prioriza [Fofoca] porque [Mecanismo]. Como essa dinâmica molda o que você sabe sobre [Notícia Séria]?" Sem julgamento moral ou perguntas óbvias.
 
-NOTÍCIAS SÉRIAS DISPONÍVEIS:
-{json.dumps(serias_dieta, ensure_ascii=False)}
-
-TÍTULOS JÁ EXIBIDOS — não use nenhum destes:
-{json.dumps(ja_exibidos, ensure_ascii=False)}
-
-REGRAS PARA CADA CAMPO:
-
-resumo_fofoca:
-- Tom ácido e informal, como quem está desconstruindo o sensacionalismo
-- Explique O QUE aconteceu E qual mecanismo emocional foi usado para prender atenção (escândalo, inveja, polêmica, identificação)
-- NÃO comece repetindo o título — vá direto ao ponto
-
-resumo_seria:
-- Tom direto e claro, sem juridiquês
-- Explique o que aconteceu, quem é afetado e qual o impacto concreto na vida das pessoas
-- NÃO comece repetindo o título — contextualize
-
-pergunta_reflexiva (1 frase):
-- Questione a DINÂMICA DOS ALGORITMOS, não o usuário
-- Estrutura: "O algoritmo prioriza X porque Y. Como isso afeta Z?"
-- Proíbido: julgamento moral, "qual é mais importante", retórica óbvia
-- Exemplo bom: "O algoritmo amplifica crises de casais famosos porque geram eengajamento mas o que isso diz sobre o que você sabe das leis que regem sua vida?"
-
-Retorne APENAS JSON válido, sem texto antes ou depois:
-{{
-  "pares": [
-    {{
-      "id_fofoca": "...",
-      "resumo_fofoca": "...",
-      "id_seria": "...",
-      "resumo_seria": "...",
-      "pergunta_reflexiva": "..."
-    }}
-  ]
-}}"""
+            Retorne APENAS JSON válido, sem preâmbulos ou markdown:
+            {{"pares": [{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}]}}"""
 
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
+                temperature=0.4,
                 response_format={"type": "json_object"}
             )
 
@@ -159,7 +126,7 @@ if st.session_state.get("dados_prontos"):
                 st.subheader("🌫️ Enquanto isso...")
                 st.markdown(f"📅 *{seria['data']}* | 📰 **Fonte:** {seria['veiculo']}")
                 st.markdown(f"**{seria['titulo']}**")
-                st.markdown(par.get("resumo_seria"))
+                st.markdown(f"{par.get('resumo_seria')}")
                 st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
                 st.write("---")
                 st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
