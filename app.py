@@ -76,6 +76,9 @@ if st.button("Descobrir os assuntos da semana"):
 
             ja_exibidos = st.session_state.titulos_exibidos
 
+            # ... (código anterior) ...
+
+            # O prompt corrigido (com as chaves duplicadas onde aparece o JSON)
             prompt = f"""Você é um analista de mídia com escrita direta e crítica.
             Seu trabalho: criar EXATAMENTE 5 PARES, cada um ligando uma fofoca a uma notícia séria.
 
@@ -84,13 +87,14 @@ if st.button("Descobrir os assuntos da semana"):
             TÍTULOS JÁ EXIBIDOS (não use nenhum destes): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
             REGRAS PARA CADA CAMPO:
-            resumo_fofoca: Analise o mecanismo de atenção. Por que esse tema viralizou (drama, polêmica, apelo emocional)? Seja analítico, evite moralismo. NÃO repita o título.
+            resumo_fofoca: Analise o mecanismo de atenção (drama, polêmica, etc). Seja analítico, evite moralismo. NÃO repita o título.
             resumo_seria: Explique a notícia política ou institucional. Foque no impacto prático na vida das pessoas. NÃO repita o título.
-            pergunta_reflexiva: Questione a dinâmica dos algoritmos. Use os nomes específicos dos temas do par. Estrutura: "O algoritmo prioriza [Fofoca] porque [Mecanismo]. Como essa dinâmica molda o que você sabe sobre [Notícia Séria]?" Sem julgamento moral ou perguntas óbvias.
+            pergunta_reflexiva: Questione a dinâmica dos algoritmos. Estrutura: "O algoritmo prioriza [Fofoca] porque [Mecanismo]. Como essa dinâmica molda o que você sabe sobre [Notícia Séria]?"
 
             Retorne APENAS JSON válido, sem preâmbulos ou markdown:
-            {{"pares": [{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}]}}"""
-
+            {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+            
+            # ... (código restante) ...
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
