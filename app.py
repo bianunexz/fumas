@@ -62,7 +62,7 @@ if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando o ecossistema de notícias..."):
         try:
             fofocas_brutas = buscar_no_google_news(
-                "fofoca OR virginia OR treta OR reality OR flagra OR influencer OR celebridade OR briga famosos OR ", "F"
+                "fofoca OR treta OR virginia OR flagra OR influencer OR celebridade OR briga famosos OR ", "F"
             )
             serias_brutas = buscar_no_google_news(
                 "projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S"
