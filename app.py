@@ -92,20 +92,21 @@ if st.button("Descobrir os assuntos da semana"):
             - NÃO só repita o título
             - Conta o que aconteceu com ironia leve
             - Explica por que isso prendeu a atenção de todo mundo sem julgar quem acompanhou
-            - Exemplo: "A Virginia postou um look de Dubai que custava mais do que o salário anual de muita gente. E isso foi comentado pois XXXXXX motivos "
+            - Exemplo: "A Virginia postou um look de Dubai que custava mais do que o salário anual de muita gente. E isso foi comentado pois muita gente acompanha esse tipo de conteúdo porque gosta de imaginar como seria ter aquele padrão de vida, além de servir como uma forma de distração e entretenimento. Também existe uma curiosidade natural de saber como vivem as pessoas muito ricas e conhecer coisas que a maioria nunca teria acesso. E, quando os influenciadores mostram tudo isso de um jeito descontraído, o assunto acaba gerando ainda mais comentários e discussões."
             
             resumo_seria:
             - NÃO comece repetindo o título
             - Explica a notícia de forma simples, como se fosse contar pra alguém que não acompanhou
             - Fala como isso afeta a vida real das pessoas, sem ser dramático
-            - Exemplo: "O Senado votou uma mudança que afeta quem trabalha com carteira assinada. Basicamente, se você ficar doente, pode receber menos do que recebia antes."
+            - Exemplo: "O Senado votou uma proposta que pode reduzir o valor recebido por trabalhadores de carteira assinada em casos de afastamento por doença. Essa é uma mudança importante porque afeta diretamente a renda de milhões de brasileiros. Por isso, acompanhar esse assunto é essencial para entender como seus direitos podem ser impactados."
             
             pergunta_reflexiva:
             - Tom de "espera, isso é estranho né?" — não de sermão
             - Conecta a fofoca específica com a notícia específica
             -E Faz um critica em tom ironico
-            - Exemplo: "Você realmente escolheu ver o look da Virginia e não saber dessa votação que realmente te afeta, ou o algoritmo já escolheu por você?"
-            
+            - Exemplo: "Enquanto você via o que um influenciador comprou hoje, sabia que uma votação importante sobre os seus direitos trabalhistas estava acontecendo?
+                        Você realmente escolheu acompanhar a vida dos influenciadores e ignorar uma votação que pode mexer no seu salário, ou o algoritmo decidiu isso por você?    
+                        Se uma votação pode alterar um direito seu, por que ela recebe menos atenção do que um vídeo de 30 segundos no TikTok?"
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
                         
