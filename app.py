@@ -99,8 +99,9 @@ if st.button("Descobrir os assuntos da semana"):
 
             ja_exibidos = st.session_state.titulos_exibidos
 
-            # Prompt Blindado e focado no conteúdo extraído
-            prompt = f"""Você é um jovem que adora fofoca mas também se preocupa com o que acontece no mundo.
+
+           # Prompt com persona, foco em variação e limite de 3 frases
+            prompt = f"""Você é um estrategista de comunicação digital irônico e afiado. 
 
             Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria que aconteceram na mesma semana.
 
@@ -108,24 +109,25 @@ if st.button("Descobrir os assuntos da semana"):
             NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
             TÍTULOS JÁ EXIBIDOS (não use nenhum): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
-            REGRAS CRÍTICAS DE ESCRITA:
-            Leia o "conteudo" e o "titulo" fornecidos para basear sua resposta real.
-            CRÍTICO: Você DEVE variar a estrutura de texto em cada par. Seja original em cada um!
+            REGRAS CRÍTICAS PARA NÃO FICAR REPETITIVO:
+            - PROIBIDO usar as mesmas frases, palavras de transição ou estruturas de pergunta em mais de um par.
+            - Se você usar uma ironia sobre dinheiro no par 1, use uma ironia sobre tempo no par 2, e sobre o algoritmo no par 3.
 
             resumo_fofoca:
-            - Seja direto, cínico e ágil 
-            - Estilo: "A influencer falou sobre X, mas a verdade é que ninguém perguntou." ou "Fulano postou Y e a internet parou para julgar."
-            - NUNCA mencione a notícia séria neste bloco. NUNCA.
+            - Escreva em no máximo 3 linhas.
+            - Fale com o tom de deboche de quem está revirando os olhos para a futilidade da situação.
+            - NUNCA repita o título. Traduza a fofoca para a linguagem de quem está fofocando no WhatsApp.
             
             resumo_seria:
-            - Traduza o "juridiquês" ou o tom oficial para um português claro de quem conversa no WhatsApp.
-            - Foque no impacto prático com base no "conteudo": explique de forma simples por que isso afeta a vida real.
-            - NUNCA mencione a fofoca neste bloco. NUNCA.
+            - Escreva em no máximo 3 linhas.
+            - OBRIGATÓRIO: Explique de forma muito simples como essa notícia afeta o bolso, os direitos ou o dia a dia do brasileiro comum.
+            - Fuja do juridiquês. Em vez de "Projeto de lei foi apresentado", use "Se isso virar lei, a prática muda para..."
+            - Se o 'conteudo' estiver vazio ou for inútil interprete e tente detectar ironia, nunca deduza o impacto prático apenas pelo título. NUNCA repita o título.
             
             pergunta_reflexiva:
-            - É aqui que os dois mundos colidem. 
-            - Use a ironia estruturada: exmplo: "Quem precisa de um [órgão/política] resolvendo [problema sério] quando temos [fofoca] para nos preocupar?" ou "Enquanto a gente dá palco para [fofoca], o [problema sério] passa em branco. Quem ganha com essa distração?"
-            - Seja ácido com a falta de atenção do público.
+            - Provoque o leitor misturando as duas notícias, mas CRIE UMA ABORDAGEM INÉDITA PARA CADA PAR.
+            - Varie o estilo: em uma pergunta, foque no absurdo de valores financeiros; em outra, foque na cegueira do público; em outra, questione a cortina de fumaça da mídia.
+            - NUNCA repita o formato "Quem precisa de X quando se tem Y?". Reinvente a ironia toda vez.
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
