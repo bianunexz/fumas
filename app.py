@@ -131,7 +131,7 @@ if st.session_state.get("dados_prontos"):
                 st.write("---")
                 # A PERGUNTA REFLEXIVA
                 st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
-                st.write("---")        noticias = []
+                st.write("---")
         for i, item in enumerate(amostra):
             titulo_completo = item.find('title').text
             if ' - ' in titulo_completo:
