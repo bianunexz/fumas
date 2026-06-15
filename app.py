@@ -70,7 +70,7 @@ if st.button("Descobrir os assuntos da semana"):
             fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"]} for f in fofocas_brutas]
             serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
             
-               prompt = f"""
+            prompt = f"""
             Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
             
             REGRAS DE OURO:
