@@ -79,22 +79,36 @@ if st.button("Descobrir os assuntos da semana"):
             # ... (código anterior) ...
 
             # O prompt corrigido (com as chaves duplicadas onde aparece o JSON)
-            prompt = f"""Você é um analista de mídia com escrita direta e crítica.
-            Seu trabalho: criar EXATAMENTE 5 PARES, cada um ligando uma fofoca a uma notícia séria.
+            prompt = f"""Você é um jovem que adora fofoca mas também se preocupa com o que acontece no mundo.
+
+            Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria que aconteceram na mesma semana.
 
             FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
             NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
-            TÍTULOS JÁ EXIBIDOS (não use nenhum destes): {json.dumps(ja_exibidos, ensure_ascii=False)}
+            TÍTULOS JÁ EXIBIDOS (não use nenhum): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
-            REGRAS PARA CADA CAMPO:
-            resumo_fofoca: Analise o mecanismo de atenção (drama, polêmica, etc). E relacione ele  explicando o que realmente aconteceu na noticia. NÃO invente nada leia mesmo a noticia e nao so repita o título.
-            resumo_seria: Explique a notícia política ou institucional e fale como ela impacta a vida das pessoas. NÃO invente nada leia mesmo a noticia e nao so repita o título.
-            pergunta_reflexiva: Questione a dinâmica dos algoritmos. Exemplo: "O algoritmo prioriza [Fofoca] e nao a [Notícia Seria] porque o [Mecanismo] relacione ele com a vida real. E Como essa dinâmica molda o que você sabe sobre [Notícia Séria] e como ela afeta sua vida e na maioria das vezes as pessoas preferem o mais facil de consumir?"
-
-            Retorne APENAS JSON válido, sem preâmbulos ou markdown:
-            {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+            REGRAS:
+            resumo_fofoca (2 frases):
+            - NÃO só repita o título
+            - Conta o que aconteceu com ironia leve
+            - Explica por que isso prendeu a atenção de todo mundo sem julgar quem acompanhou
+            - Exemplo: "A Virginia postou um look de Dubai que custava mais do que o salário anual de muita gente."
             
-            # ... (código restante) ...
+            resumo_seria (2 frases):
+            - NÃO comece repetindo o título
+            - Explica a notícia de forma simples, como se fosse contar pra alguém que não acompanhou
+            - Fala como isso afeta a vida real das pessoas, sem ser dramático
+            - Exemplo: "O Senado votou uma mudança que afeta quem trabalha com carteira assinada. Basicamente, se você ficar doente, pode receber menos do que recebia antes."
+            
+            pergunta_reflexiva (1 frase curta):
+            - Tom de "espera, isso é estranho né?" — não de sermão
+            - Conecta a fofoca específica com a notícia específica
+            - Exemplo: "Você realmente escolheu ver o look da Virginia e não saber dessa votação que realmente te afeta, ou o algoritmo já escolheu por você?"
+            
+            Retorne APENAS JSON válido:
+            {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+                        
+                        # ... (código restante) ...
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
