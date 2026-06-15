@@ -19,7 +19,7 @@ def formatar_data(data_rss):
     except:
         return "Nesta semana"
 
-def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20):
+def buscar_no_google_news(termo_busca, prefixo_id, max_itens=15):
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
         url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419&num=20"
@@ -59,40 +59,45 @@ if "dados_prontos" not in st.session_state:
     st.session_state.titulos_exibidos = []
 
 if st.button("Descobrir os assuntos da semana"):
-    with st.spinner("Mapeando o ecossistema de notícias..."):
+    with st.spinner("Mapeando o ecossistema..."):
         try:
             fofocas_brutas = buscar_no_google_news("briga famosos OR influencer OR treta OR reality OR famoso OR flagra OR fofoca OR celebridade OR Virginia", "F")
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S")
-            if not fofocas_brutas or not serias_brutas:
-                st.error("O buscador falhou. Tente novamente.")
-                st.stop()
+            
             st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_brutas}
             st.session_state.serias_originais = {s["id"]: s for s in serias_brutas}
+            
             fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"]} for f in fofocas_brutas]
             serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
+            
             prompt = f"""
-            Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
+            Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS (nem mais, nem menos).
             REGRAS:
-            1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
-            2. FOFOCA: O "resumo_fofoca" deve ser bem informal e ácido.
-            3. SÉRIA: O "resumo_seria" deve explicar o impacto real.
-            4. REFLEXÃO: Adicione uma "pergunta_reflexiva" (pergunta aberta e provocativa) que force o usuário a pensar por que a fofoca recebeu mais atenção.
+            1. NÃO REPITA títulos já exibidos: {st.session_state.titulos_exibidos}.
+            2. FOFOCA: O "resumo_fofoca" deve ser bem informal, ácido e explicar o "babado".
+            3. SÉRIA: O "resumo_seria" deve explicar o impacto real na sociedade.
+            4. REFLEXÃO: Adicione uma "pergunta_reflexiva" (pergunta aberta e provocativa) sobre o redirecionamento da atenção.
+            
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria, pergunta_reflexiva.
             Dados: {fofocas_dieta} | {serias_dieta}
             """
+            
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
                 response_format={"type": "json_object"}
             )
+            
             st.session_state.resultado = json.loads(resposta.choices[0].message.content)
+            
             for par in st.session_state.resultado.get("pares", []):
                 f_obj = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
                 if f_obj: st.session_state.titulos_exibidos.append(f_obj['titulo'])
+            
             st.session_state.dados_prontos = True
         except Exception as e:
-            st.error(f"Erro ao processar: {e}")
+            st.error(f"Ops, erro ao processar: {e}")
 
 # 3. Exibição
 if st.session_state.get("dados_prontos"):
@@ -100,6 +105,7 @@ if st.session_state.get("dados_prontos"):
     for idx, par in enumerate(st.session_state.resultado.get("pares", [])):
         fofoca = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
         seria = st.session_state.serias_originais.get(par.get("id_seria"))
+        
         if fofoca and seria:
             if st.button(f"👉 {fofoca['titulo']}", key=f"btn_{idx}"):
                 st.markdown(f"📅 *{fofoca['data']}* | 📰 **Fonte:** {fofoca['veiculo']}")
