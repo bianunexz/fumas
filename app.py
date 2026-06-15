@@ -88,6 +88,7 @@ if st.button("Descobrir os assuntos da semana"):
             TÍTULOS JÁ EXIBIDOS (não use nenhum): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
             REGRAS:
+            Antes de escrever qualquer resumo, leia com atenção o título completo e o veículo de cada notícia para entender o tom, o contexto e se é irônico, sensacionalista ou sério. Só então escreva os resumos.
             resumo_fofoca:
             - NÃO só repita o título
             - Conta o que aconteceu com ironia leve
