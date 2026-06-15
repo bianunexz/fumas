@@ -89,7 +89,7 @@ if st.button("Descobrir os assuntos da semana"):
             REGRAS PARA CADA CAMPO:
             resumo_fofoca: Analise o mecanismo de atenção (drama, polêmica, etc). E relacione explicando o que aconteceu na noticia. NÃO invente nada leia mesmo a noticia e nao so repita o título.
             resumo_seria: Explique a notícia política ou institucional.E o impacto dela na vida das pessoas. NÃO invente nada leia mesmo a noticia e nao so repita o título.
-            pergunta_reflexiva: Questione a dinâmica dos algoritmos. Exemplo: "O algoritmo prioriza [Fofoca] porque [Mecanismo]. E Como essa dinâmica molda o que você sabe sobre [Notícia Séria] e como ela afeta sua vida?"
+            pergunta_reflexiva: Questione a dinâmica dos algoritmos. Exemplo: "O algoritmo prioriza [Fofoca] e nao a [Notícia] porque o [Mecanismo]. E Como essa dinâmica molda o que você sabe sobre [Notícia Séria] e como ela afeta sua vida?"
 
             Retorne APENAS JSON válido, sem preâmbulos ou markdown:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
