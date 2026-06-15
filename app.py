@@ -88,21 +88,22 @@ if st.button("Descobrir os assuntos da semana"):
             TÍTULOS JÁ EXIBIDOS (não use nenhum): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
             REGRAS:
-            resumo_fofoca (2 frases):
+            resumo_fofoca:
             - NÃO só repita o título
             - Conta o que aconteceu com ironia leve
             - Explica por que isso prendeu a atenção de todo mundo sem julgar quem acompanhou
-            - Exemplo: "A Virginia postou um look de Dubai que custava mais do que o salário anual de muita gente."
+            - Exemplo: "A Virginia postou um look de Dubai que custava mais do que o salário anual de muita gente. E isso foi comentado pois XXXXXX motivos "
             
-            resumo_seria (2 frases):
+            resumo_seria:
             - NÃO comece repetindo o título
             - Explica a notícia de forma simples, como se fosse contar pra alguém que não acompanhou
             - Fala como isso afeta a vida real das pessoas, sem ser dramático
             - Exemplo: "O Senado votou uma mudança que afeta quem trabalha com carteira assinada. Basicamente, se você ficar doente, pode receber menos do que recebia antes."
             
-            pergunta_reflexiva (1 frase curta):
+            pergunta_reflexiva:
             - Tom de "espera, isso é estranho né?" — não de sermão
             - Conecta a fofoca específica com a notícia específica
+            -E Faz um critica em tom ironico
             - Exemplo: "Você realmente escolheu ver o look da Virginia e não saber dessa votação que realmente te afeta, ou o algoritmo já escolheu por você?"
             
             Retorne APENAS JSON válido:
