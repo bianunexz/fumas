@@ -325,7 +325,7 @@ quem_html = (
     '<div class="quem-missao">'
     'Vivemos numa era em que o algoritmo decide o que merece atenção e muitas vezes, '
     'o que mais viraliza é o que menos importa. '
-    'Por isso a Cortina de Fumaça nasceu, para mostrar esse contraste: ao lado de cada fofoca que dominou os feeds, 
+    'Por isso a Cortina de Fumaça nasceu, para mostrar esse contraste: ao lado de cada fofoca que dominou os feeds,'
     'há uma notícia séria que passou quase despercebida. '
     'Porque saber que existe uma cortina é o primeiro passo para enxergar além dela.'
     '</div>'
