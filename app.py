@@ -85,6 +85,8 @@ if st.button("Descobrir os assuntos da semana"):
             1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
             2. FOFOCA: O "resumo_fofoca" deve ser bem informal e ácido, explicando por que o assunto viralizou e virou um "babado".
             3. SÉRIA: O "resumo_seria" deve explicar o impacto real da notícia na sociedade.
+            ADICIONE AO FINAL DE CADA PAR:
+            - "pergunta_reflexiva": Uma pergunta aberta que se relacione com as noticias e provocativa que force o usuário a pensar sobre por que a notícia séria foi ofuscada pela fofoca, sem entregar a resposta.
             
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria.
             Dados: {fofocas_dieta} | {serias_dieta}
