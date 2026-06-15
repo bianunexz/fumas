@@ -85,9 +85,9 @@ if st.button("Descobrir os assuntos da semana"):
             REGRAS DE OURO:
             1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
             
-            2. RESUMO DA FOFOCA: Analise o mecanismo de atenção. Por que esse tema viralizou? É pelo drama, pela identificação pessoal ou por apelo emocional? Evite moralismo, seja analítico e cínico sobre as táticas de engajamento. NÃO repita o título.
-            
-            3. RESUMO SÉRIO: Explique a notícia política ou institucional. Foque no impacto prático na vida das pessoas (leis, orçamento, decisões). NÃO repita o título.
+            2. RESUMO DA FOFOCA: Use um tom ácido, informal e cínico. Destaque como o sensacionalismo foi construído para prender a atenção não so repita o titulo da noticia.
+
+            3. RESUMO SÉRIO: Explique a notícia política de forma clara, focando no impacto real dela na vida da pessoas não so repita o titulo da noticia.
             
             4. PERGUNTA REFLEXIVA: A pergunta deve questionar a ALOCAÇÃO DA ATENÇÃO. Não confronte o usuário sobre "qual é mais importante" (pois isso é subjetivo), mas pergunte sobre o porquê do algoritmo priorizar o apelo emocional da fofoca em detrimento da notícia pública. 
             Exemplo: 'O algoritmo prioriza as figuras públicas em vez de mudanças nas leis trabalhistas por que isso gera mais cliques imediatos. Como essa dinâmica molda o que você sabe sobre o país?'
