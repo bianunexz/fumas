@@ -163,8 +163,8 @@ if st.session_state.get("dados_prontos"):
                 "data": formatar_data(item.find("pubDate").text)
             })
         return noticias
-        except:
-        return []
+            except:
+                return []
 
 # ── Interface ─────────────────────────────────────────────────────────────────
 st.title("📰 CORTINA DE FUMAÇA")
