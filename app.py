@@ -116,17 +116,17 @@ if st.button("Descobrir os assuntos da semana"):
             resumo_fofoca:
             - Escreva em no máximo 3 linhas.
             - Fale com o tom de deboche de quem está revirando os olhos para a futilidade da situação.
-            - NUNCA repita o título. Traduza a fofoca para a linguagem de quem está fofocando no WhatsApp.
+            - NUNCA so repita o título. Traduza a fofoca para a linguagem de quem está fofocando no WhatsApp e principalmente leia a reportagem nao invente e so repita o titulo.
             
             resumo_seria:
             - Escreva em no máximo 3 linhas.
-            - OBRIGATÓRIO: Explique de forma muito simples como essa notícia afeta o bolso, os direitos ou o dia a dia do brasileiro comum.
+            - OBRIGATÓRIO: Explique como essa notícia afeta o dia a dia do brasileiro comum.
             - Fuja do juridiquês. Em vez de "Projeto de lei foi apresentado", use "Se isso virar lei, a prática muda para..."
-            - Se o 'conteudo' estiver vazio ou for inútil interprete e tente detectar ironia, nunca deduza o impacto prático apenas pelo título. NUNCA repita o título.
+            - Se o 'conteudo' estiver vazio ou for inútil interprete e tente detectar ironia, nunca deduza o impacto prático apenas pelo título. NUNCA so repita o título.
             
             pergunta_reflexiva:
             - Provoque o leitor misturando as duas notícias, mas CRIE UMA ABORDAGEM INÉDITA PARA CADA PAR.
-            - Varie o estilo: em uma pergunta, foque no absurdo de valores financeiros; em outra, foque na cegueira do público; em outra, questione a cortina de fumaça da mídia.
+            - Varie o estilo: por exemplo em uma pergunta, foque no absurdo de valores financeiros; em outra, foque na cegueira do público; em outra, questione a cortina de fumaça da mídia.
             - NUNCA repita o formato "Quem precisa de X quando se tem Y?". Reinvente a ironia toda vez.
 
             Retorne APENAS JSON válido:
