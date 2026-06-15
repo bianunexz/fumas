@@ -5,7 +5,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 import json
 from email.utils import parsedate_to_datetime
-import random # Importante para diversificar
+import random
 
 # 1. Configurações
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
@@ -19,10 +19,9 @@ def formatar_data(data_rss):
     except:
         return "Nesta semana"
 
-def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20): # Aumentamos para 20
+def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20):
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
-        # O &num=20 garante que buscaremos mais resultados
         url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419&num=20"
         
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
@@ -33,8 +32,6 @@ def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20): # Aumentamos p
             
         root = ET.fromstring(xml_data)
         itens = root.findall('.//item')
-        
-        # Sorteia uma amostra aleatória dos resultados para nunca vir a mesma lista
         amostra = random.sample(itens, min(len(itens), max_itens))
         
         noticias = []
@@ -64,10 +61,11 @@ st.write("Nem tudo que domina sua timeline é o que mais impacta sua vida.")
 
 if "dados_prontos" not in st.session_state:
     st.session_state.dados_prontos = False
+    st.session_state.titulos_exibidos = [] # MEMÓRIA DE EXCLUSÃO
 
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Mapeando o ecossistema de notícias..."):
-        try:# 
+        try:
             fofocas_brutas = buscar_no_google_news("briga famosos OR influencer OR treta OR reality OR famoso OR flagra OR fofoca OR celebridade OR Virginia", "F")
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S")
             
@@ -83,9 +81,10 @@ if st.button("Descobrir os assuntos da semana"):
             
             prompt = f"""
             Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
-            Regras: 
-            1. Seja surpreendente: escolha assuntos variados.
-            2. Evite o óbvio e busque o contraste entre o fútil e o urgente.
+            REGRAS DE OURO:
+            1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
+            2. Seja surpreendente: escolha assuntos variados.
+            3. Evite o óbvio e busque o contraste entre o fútil e o urgente.
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria.
             Dados: {fofocas_dieta} | {serias_dieta}
             """
@@ -93,11 +92,17 @@ if st.button("Descobrir os assuntos da semana"):
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7, # Aumentamos a temperatura para a IA ser mais criativa/variada
+                temperature=0.7,
                 response_format={"type": "json_object"}
             )
             
             st.session_state.resultado = json.loads(resposta.choices[0].message.content)
+            
+            # ATUALIZA A MEMÓRIA COM OS TÍTULOS NOVOS
+            for par in st.session_state.resultado.get("pares", []):
+                f_obj = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
+                if f_obj: st.session_state.titulos_exibidos.append(f_obj['titulo'])
+            
             st.session_state.dados_prontos = True
         except Exception as e:
             st.error(f"Erro ao processar: {e}")
