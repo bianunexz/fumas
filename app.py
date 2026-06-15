@@ -80,7 +80,6 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Lendo matérias e mapeando o ecossistema de notícias (Isso pode levar alguns segundos)..."):
         try:
-            # Pede 20 notícias ao Google para ter margem de exclusão
             fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "Comentou" OR "respondeu" OR "Famosos" OR "influencer"', "F", max_itens=20)
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", max_itens=20)
 
@@ -90,7 +89,6 @@ if st.button("Descobrir os assuntos da semana"):
 
             ja_exibidos = st.session_state.titulos_exibidos
 
-            # FILTRO REAL NO CÓDIGO PYTHON: Tira o que já foi lido e seleciona as 5 inéditas
             fofocas_novas = [f for f in fofocas_brutas if f["titulo"] not in ja_exibidos][:5]
             serias_novas = [s for s in serias_brutas if s["titulo"] not in ja_exibidos][:5]
 
@@ -100,41 +98,46 @@ if st.button("Descobrir os assuntos da semana"):
             fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fofocas_novas]
             serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_novas]
 
-            # Prompt ajustado para leitura profunda, detecção de ironia e resumos maiores
+            # ── PROMPT ATUALIZADO ──────────────────────────────────────────────
             prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
-            
-            Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
-            
-            FOFOCAS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
-            NOTÍCIAS SÉRIAS: {json.dumps(serias_dieta, ensure_ascii=False)}
-            
-            Para cada par, preencha:
-            
-            - id_fofoca / id_seria: os IDs dos itens escolhidos
-            - resumo_fofoca: 2 frases explicando O QUE ACONTECEU de fato (leia o campo "conteudo"). 
-              Se for morte ou luto: tom sério e respeitoso, sem ironia.
-              Se for fofoca comum: tom levemente irônico sobre a futilidade.
-            - resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Sem juridiquês. Didático.
-            - pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
-              NUNCA invente relação de causa/efeito entre os dois assuntos.
-              NUNCA culpe o público por ter empatia com tragédias.
-              Varie o formato da pergunta em cada par.
-            
-            IMPORTANTE: Baseie os resumos no campo "conteudo" de cada notícia, não apenas no título.
-            
-            Retorne APENAS JSON válido:
-            {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
-                        
+
+Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
+
+FOFOCAS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
+NOTÍCIAS SÉRIAS: {json.dumps(serias_dieta, ensure_ascii=False)}
+
+Para cada par, preencha:
+
+- id_fofoca / id_seria: os IDs dos itens escolhidos
+
+- resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
+  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
+  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
+  Se for morte ou luto: tom sério e respeitoso, sem ironia.
+  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
+  Se for fofoca comum: tom levemente irônico sobre a futilidade.
+
+- resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
+
+- pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
+  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
+  PROIBIDO: perguntas genéricas como "o que é mais importante para você?" ou "passado vs futuro?".
+  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
+  PROIBIDO: culpar o público por ter empatia com tragédias — critique a máquina de cliques, não as pessoas.
+  Varie o formato da pergunta em cada par.
+
+Retorne APENAS JSON válido:
+{{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+
             resposta = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="llama-3.3-70b-versatile",  # ← modelo atualizado
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7, 
+                temperature=0.5,  # ← menos alucinação
                 response_format={"type": "json_object"}
             )
 
             st.session_state.resultado = json.loads(resposta.choices[0].message.content)
 
-            # Salva no histórico para não repetir nos próximos cliques
             for par in st.session_state.resultado.get("pares", []):
                 f_obj = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
                 if f_obj:
@@ -169,3 +172,4 @@ if st.session_state.get("dados_prontos"):
                 st.write("---")
                 st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
                 st.write("---")
+                
