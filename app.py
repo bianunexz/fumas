@@ -298,7 +298,8 @@ if st.session_state.get("dados_prontos"):
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── QUEM SOMOS ────────────────────────────────────────────────────────────────
-st.markdown("""
+# ── QUEM SOMOS ────────────────────────────────────────────────────────────────
+st.markdown(f"""
 <div class="quem-wrap">
     <div class="quem-eyebrow">O projeto</div>
     <div class="quem-title">Quem somos</div>
@@ -306,28 +307,35 @@ st.markdown("""
 
     <div class="quem-cards">
         <div class="quem-card">
-            <div class="quem-foto-placeholder">B</div>
+            <img src="data:image/jpeg;base64,{foto_bianca}"
+                 style="width:110px;height:110px;border-radius:50%;
+                        object-fit:cover;object-position:center top;
+                        border:3px solid #C0392B;margin:0 auto 0.75rem;display:block;">
             <div class="quem-nome">Bianca Nunes</div>
             <div class="quem-role">Co-criadora</div>
         </div>
         <div class="quem-card">
-            <div class="quem-foto-placeholder">M</div>
+            <img src="data:image/jpeg;base64,{foto_mariana}"
+                 style="width:110px;height:110px;border-radius:50%;
+                        object-fit:cover;object-position:center top;
+                        border:3px solid #C0392B;margin:0 auto 0.75rem;display:block;">
             <div class="quem-nome">Mariana Gontijo</div>
             <div class="quem-role">Co-criadora</div>
         </div>
     </div>
 
     <div class="quem-missao">
-        Vivemos numa era em que o algoritmo decide o que merece atenção — e muitas vezes,
+        Vivemos numa era em que o algoritmo decide o que merece atenção e muitas vezes,
         o que mais viraliza é o que menos importa. A Cortina de Fumaça nasceu para mostrar
         esse contraste: ao lado de cada fofoca que dominou os feeds, há uma notícia séria
-        que passou quase despercebida. Não para culpar ninguém, mas para abrir uma janela.
+        que passou quase despercebida. 
+        Porque saber que existe uma cortina é o primeiro passo para enxergar além dela."
     </div>
 
     <div class="quem-fgv">
         Matéria de Comunicação, Filosofia &amp; Tecnologia — IA<br>
         Prof. Luis Gustavo de Oliveira Rodrigues<br>
-        FGV Escola de Comunicação
+       Escola de Comunicação DiGital FGV-RIO 
     </div>
 </div>
 """, unsafe_allow_html=True)
