@@ -149,7 +149,8 @@ if st.session_state.get("dados_prontos"):
                 st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
                 st.write("---")
                 st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
-                st.write("---")                titulo = titulo_completo.rsplit(" - ", 1)[0]
+                st.write("---")                
+                titulo = titulo_completo.rsplit(" - ", 1)[0]
                 veiculo = titulo_completo.rsplit(" - ", 1)[-1]
             else:
                 titulo = titulo_completo
