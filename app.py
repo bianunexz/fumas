@@ -101,32 +101,30 @@ if st.button("Descobrir os assuntos da semana"):
             serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_novas]
 
             # Prompt ajustado para leitura profunda, detecção de ironia e resumos maiores
-            prompt = f"""Você é um estrategista de comunicação digital irônico e afiado, com faro jornalístico. 
+           prompt = f"""Você é um estrategista de comunicação digital. 
 
             Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria da mesma semana.
 
             FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
             NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
 
-            REGRAS DE SEGURANÇA E VARIAÇÃO:
-            1. TRAVA DE TRAGÉDIA: Se a notícia envolver MORTE, ACIDENTE, DOENÇA ou CRIME VIOLENTO, ZERO IRONIA nesse resumo. Seja respeitoso e factual.
-            2. NÃO MISTURE PERSONAGENS: A fofoca e a notícia séria não têm relação na vida real.
-            3. VARIEDADE: É expressamente proibido repetir a estrutura das perguntas reflexivas. Mude a abordagem (ex: tempo, dinheiro, alienação) em cada par.
+            REGRAS DE SEGURANÇA (MÁXIMA PRIORIDADE):
+            1. TRAVA DE TRAGÉDIA TOTAL: Se qualquer das notícias envolver MORTE, ACIDENTE, DOENÇA ou CRIME, é EXPRESSAMENTE PROIBIDO fazer piada, ironia ou qualquer relação absurda na 'pergunta_reflexiva'.
+            2. ECONOMIA DA ATENÇÃO: A fofoca e a notícia séria NÃO TÊM RELAÇÃO na vida real. Nunca misture os assuntos.
 
             resumo_fofoca:
-            - Escreva um mini paragrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Títulos geralmente são iscas (clickbait) ou irônicos. Explique o que DE FATO aconteceu com base no texto.
-            - Fale com tom de deboche sobre a futilidade, mas entregue a informação real. NUNCA só repita o título.
+            - Escreva um mini parágrafo.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que DE FATO aconteceu. 
+            - Se não for tragédia, pode usar tom de deboche sobre a futilidade do assunto. NUNCA só repita o título.
             
             resumo_seria:
-            - Escreva um mini paragrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado para entender a verdade por trás do título.
-            - Mastigue a informação: explique detalhadamente como essa lei, investigação ou política afeta a vida, a saúde ou o bolso do cidadão.
-            - Seja didático e fuja do juridiquês. NUNCA deduza o impacto só pelo título e NUNCA só repita o título.
+            - Escreva um mini parágrafo.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado.
+            - Explique de forma muito didática como isso afeta a vida, a saúde ou o bolso da sociedade. Sem juridiquês.
             
             pergunta_reflexiva:
-            - Foque APENAS na nossa economia da atenção e distração coletiva.
-            - CRIE UMA ABORDAGEM INÉDITA PARA CADA PAR. Reinvente a ironia toda vez. NUNCA repita o formato "Quem precisa de X quando se tem Y?".
+            - A pergunta FINAL DEVE SER SEMPRE SOBRE ISTO: Por que a sociedade dá milhões de cliques/atenção para [Tema da Fofoca], enquanto ignora o impacto real de [Tema da Notícia Séria]?
+            - Mude a forma de fazer essa pergunta em cada par, mas NUNCA fuja desse contraste de "atenção inútil vs. assunto importante". Não invente relações (ex: não relacione fisiculturismo com leis de idosos).
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
