@@ -6,7 +6,14 @@ import xml.etree.ElementTree as ET
 import json
 from email.utils import parsedate_to_datetime
 from bs4 import BeautifulSoup
+import base64
 
+def img_to_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+foto_bianca   = img_to_base64("bianca_nunes.jpg")
+foto_mariana  = img_to_base64("mariana_gontijo.jpg")
 st.set_page_config(
     page_title="Cortina de Fumaça",
     page_icon="🗞️",
