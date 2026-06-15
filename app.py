@@ -95,21 +95,21 @@ TÍTULOS JÁ EXIBIDOS — não use nenhum destes:
 
 REGRAS PARA CADA CAMPO:
 
-resumo_fofoca (máx. 2 frases):
+resumo_fofoca:
 - Tom ácido e informal, como quem está desconstruindo o sensacionalismo
 - Explique O QUE aconteceu E qual mecanismo emocional foi usado para prender atenção (escândalo, inveja, polêmica, identificação)
 - NÃO comece repetindo o título — vá direto ao ponto
 
-resumo_seria (máx. 2 frases):
+resumo_seria:
 - Tom direto e claro, sem juridiquês
 - Explique o que aconteceu, quem é afetado e qual o impacto concreto na vida das pessoas
 - NÃO comece repetindo o título — contextualize
 
-pergunta_reflexiva (1 frase, máx. 25 palavras):
+pergunta_reflexiva (1 frase):
 - Questione a DINÂMICA DOS ALGORITMOS, não o usuário
 - Estrutura: "O algoritmo prioriza X porque Y. Como isso afeta Z?"
 - Proíbido: julgamento moral, "qual é mais importante", retórica óbvia
-- Exemplo bom: "O algoritmo amplifica crises de casais famosos porque geram reengajamento imediato — o que isso diz sobre o que você sabe das leis que regem sua vida?"
+- Exemplo bom: "O algoritmo amplifica crises de casais famosos porque geram eengajamento mas o que isso diz sobre o que você sabe das leis que regem sua vida?"
 
 Retorne APENAS JSON válido, sem texto antes ou depois:
 {{
