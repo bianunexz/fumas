@@ -59,10 +59,10 @@ if "dados_prontos" not in st.session_state:
     st.session_state.titulos_exibidos = []
 
 if st.button("Descobrir os assuntos da semana"):
-    with st.spinner("Mapeando o ecossistema..."):
+    with st.spinner("Analisando o fluxo de atenção..."):
         try:
-            fofocas_brutas = buscar_no_google_news("briga famosos OR influencer OR treta OR reality OR famoso OR flagra OR fofoca OR celebridade OR Virginia", "F")
-            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR Deputados OR Votação OR Congresso", "S")
+            fofocas_brutas = buscar_no_google_news("briga famosos OR influencer OR treta OR reality OR famoso OR flagra OR fofoca OR celebridade", "F")
+            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S")
             
             st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_brutas}
             st.session_state.serias_originais = {s["id"]: s for s in serias_brutas}
@@ -70,17 +70,15 @@ if st.button("Descobrir os assuntos da semana"):
             fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"]} for f in fofocas_brutas]
             serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
             
+            # PROMPT CORRIGIDO: Analítico, não moralizante.
             prompt = f"""
             Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
             
-            REGRAS DE OURO:
-            1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
-            
-            2. RESUMO DA FOFOCA: Use um tom ácido, informal e cínico. Destaque como o sensacionalismo foi construído para prender a atenção.
-            
-            3. RESUMO SÉRIO: Explique a notícia política de forma clara, focando no impacto institucional real.
-            
-            4. PERGUNTA REFLEXIVA: Crie uma pergunta provocativa que confronte o usuário sobre a sua escolha de atenção. A pergunta DEVE relacionar o conteúdo da fofoca (o babado) com a notícia séria (o fato institucional). Exemplo: 'Será que o preço que você paga pela fofoca é a sua cegueira sobre esse projeto de lei?'
+            REGRAS DE CONDUTA:
+            1. NÃO REPITA títulos já exibidos: {st.session_state.titulos_exibidos}.
+            2. RESUMO (Ambos): Seja objetivo. Explique o que aconteceu sem juízo de valor ou tom de denúncia.
+            3. RELAÇÃO: O objetivo é mostrar a coexistência. A pergunta deve ser sobre a alocação da atenção do leitor, não sobre falha da imprensa.
+            4. PERGUNTA REFLEXIVA: Faça uma pergunta aberta que convide o usuário a considerar por que determinados temas ganham mais visibilidade social que outros, sem sugerir conspiração.
             
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria, pergunta_reflexiva.
             Dados: {fofocas_dieta} | {serias_dieta}
@@ -89,7 +87,7 @@ if st.button("Descobrir os assuntos da semana"):
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
+                temperature=0.4, # Temperatura mais baixa para ser mais preciso e menos "criativo/ácido"
                 response_format={"type": "json_object"}
             )
             
@@ -101,11 +99,11 @@ if st.button("Descobrir os assuntos da semana"):
             
             st.session_state.dados_prontos = True
         except Exception as e:
-            st.error(f"Ops, erro ao processar: {e}")
+            st.error(f"Erro ao processar: {e}")
 
 # 3. Exibição
 if st.session_state.get("dados_prontos"):
-    st.subheader("🔥 Assuntos em alta da semana")
+    st.subheader("🔥 Comparativo da Semana")
     for idx, par in enumerate(st.session_state.resultado.get("pares", [])):
         fofoca = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
         seria = st.session_state.serias_originais.get(par.get("id_seria"))
@@ -113,14 +111,12 @@ if st.session_state.get("dados_prontos"):
         if fofoca and seria:
             if st.button(f"👉 {fofoca['titulo']}", key=f"btn_{idx}"):
                 st.markdown(f"📅 *{fofoca['data']}* | 📰 **Fonte:** {fofoca['veiculo']}")
-                st.markdown(f"**Por que bombou?** {par.get('resumo_fofoca')}")
-                st.markdown(f"[🔗 Ver na fonte]({fofoca['link']})")
+                st.markdown(f"**Sobre esta notícia:** {par.get('resumo_fofoca')}")
                 st.write("---")
-                st.subheader("🌫️ Enquanto isso...")
+                st.subheader("🌫️ Outro evento da semana")
                 st.markdown(f"📅 *{seria['data']}* | 📰 **Fonte:** {seria['veiculo']}")
                 st.markdown(f"**{seria['titulo']}**")
                 st.markdown(f"{par.get('resumo_seria')}")
-                st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
                 st.write("---")
                 st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
                 st.write("---")
