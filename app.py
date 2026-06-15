@@ -5,6 +5,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 import json
 from email.utils import parsedate_to_datetime
+from bs4 import BeautifulSoup
 
 # ── Config ────────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Cortina de Fumaça", page_icon="📰")
@@ -18,6 +19,23 @@ def formatar_data(data_rss):
     except:
         return "Nesta semana"
 
+# NOVO: Função para o assistente "ler" a matéria com BeautifulSoup
+def extrair_texto_noticia(url):
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        # Timeout curto para não deixar seu site lento se um portal de notícias demorar
+        with urllib.request.urlopen(req, timeout=4) as response:
+            html = response.read()
+        
+        soup = BeautifulSoup(html, "html.parser")
+        paragrafos = soup.find_all('p')
+        
+        # Pega as primeiras linhas de texto para entender o contexto real
+        texto = " ".join([p.get_text(strip=True) for p in paragrafos[:3]])
+        return texto if len(texto) > 20 else "Conteúdo não disponível. Baseie-se apenas no título."
+    except:
+        return "Conteúdo não extraído. Baseie-se apenas no título."
+
 def buscar_no_google_news(termo_busca, prefixo_id, max_itens=5): 
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
@@ -29,7 +47,6 @@ def buscar_no_google_news(termo_busca, prefixo_id, max_itens=5):
         root = ET.fromstring(xml_data)
         itens = root.findall(".//item")
         
-        # Pega as top matérias ranqueadas pelo Google, sem sortear
         amostra = itens[:max_itens] 
         noticias = []
         for i, item in enumerate(amostra):
@@ -40,12 +57,16 @@ def buscar_no_google_news(termo_busca, prefixo_id, max_itens=5):
             else:
                 titulo = titulo_completo
                 veiculo = "Portal de Notícias"
+            
+            link = item.find("link").text
+            
             noticias.append({
                 "id": f"{prefixo_id}{i}",
                 "titulo": titulo,
                 "veiculo": veiculo,
-                "link": item.find("link").text,
-                "data": formatar_data(item.find("pubDate").text)
+                "link": link,
+                "data": formatar_data(item.find("pubDate").text),
+                "conteudo": extrair_texto_noticia(link)[:600] # Envia 600 caracteres para o modelo não se perder
             })
         return noticias
     except:
@@ -60,9 +81,8 @@ if "dados_prontos" not in st.session_state:
     st.session_state.titulos_exibidos = []
 
 if st.button("Descobrir os assuntos da semana"):
-    with st.spinner("Mapeando o ecossistema de notícias..."):
+    with st.spinner("Lendo matérias e mapeando o ecossistema de notícias (Isso pode levar alguns segundos)..."):
         try:
-            # Termos de busca refinados que você montou
             fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "assumiu" OR "Virginia OR Comentou OR respondeu OR Famosos "', "F", max_itens=5)
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", max_itens=5)
 
@@ -73,12 +93,13 @@ if st.button("Descobrir os assuntos da semana"):
             st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_brutas}
             st.session_state.serias_originais  = {s["id"]: s for s in serias_brutas}
 
-            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"]} for f in fofocas_brutas]
-            serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"]} for s in serias_brutas]
+            # Agora mandamos também o "conteúdo" raspado da web para a IA
+            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fofocas_brutas]
+            serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_brutas]
 
             ja_exibidos = st.session_state.titulos_exibidos
 
-            # Prompt ajustado para evitar respostas robóticas
+            # Prompt Blindado e focado no conteúdo extraído
             prompt = f"""Você é um jovem que adora fofoca mas também se preocupa com o que acontece no mundo.
 
             Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria que aconteceram na mesma semana.
@@ -88,23 +109,23 @@ if st.button("Descobrir os assuntos da semana"):
             TÍTULOS JÁ EXIBIDOS (não use nenhum): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
             REGRAS CRÍTICAS DE ESCRITA:
-            Antes de escrever, leia os títulos e veículos para entender o tom.
-            CRÍTICO: Você DEVE variar a estrutura de texto em cada par. NUNCA repita as mesmas frases ou o mesmo formato de explicação. Seja original em cada um!
+            Leia o "conteudo" e o "titulo" fornecidos para basear sua resposta real.
+            CRÍTICO: Você DEVE variar a estrutura de texto em cada par. Seja original em cada um!
 
             resumo_fofoca:
-            - NÃO repita o título.
-            - Conte o que aconteceu com ironia leve.
-            - Explique de forma CRIATIVA por que isso chamou tanta atenção do público (sem julgar quem acompanhou).
+            - Seja direto, cínico e ágil (máximo de 2 frases).
+            - Estilo: "A influencer falou sobre X, mas a verdade é que ninguém aguenta mais." ou "Fulano postou Y e a internet parou para julgar."
+            - NUNCA mencione a notícia séria neste bloco. NUNCA.
             
             resumo_seria:
-            - NÃO comece repetindo o título.
-            - Explique a notícia de forma simples, como se fosse contar pra um amigo.
-            - Fale como isso afeta a vida real das pessoas, sem ser muito dramático.
+            - Traduza o "juridiquês" ou o tom oficial para um português claro de quem conversa no WhatsApp.
+            - Foque no impacto prático com base no "conteudo": explique de forma simples por que isso afeta a vida real.
+            - NUNCA mencione a fofoca neste bloco. NUNCA.
             
             pergunta_reflexiva:
-            - Tom de "espera, isso é estranho né?" — não de sermão.
-            - Conecta o tema da fofoca com a notícia séria fazendo uma crítica irônica.
-            - NUNCA use a mesma estrutura de pergunta duas vezes. Invente jeitos novos de perguntar em cada par!
+            - É aqui que os dois mundos colidem. 
+            - Use a ironia estruturada: "Quem precisa de um [órgão/política] resolvendo [problema sério] quando temos [fofoca] para nos preocupar?" ou "Enquanto a gente dá palco para [fofoca], o [problema sério] passa em branco. Quem ganha com essa distração?"
+            - Seja ácido com a falta de atenção do público.
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
@@ -112,7 +133,7 @@ if st.button("Descobrir os assuntos da semana"):
             resposta = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.8,
+                temperature=0.7, 
                 response_format={"type": "json_object"}
             )
 
