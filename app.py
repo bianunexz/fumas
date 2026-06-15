@@ -83,7 +83,7 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Lendo matérias e mapeando o ecossistema de notícias (Isso pode levar alguns segundos)..."):
         try:
-            fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "assumiu" OR "Virginia OR Comentou OR respondeu OR Famosos "', "F", max_itens=5)
+            fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "assumiu" OR "Virginia OR "Comentou" OR "respondeu" OR "Famosos" "', "F", max_itens=5)
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", max_itens=5)
 
             if not fofocas_brutas or not serias_brutas:
@@ -114,12 +114,12 @@ if st.button("Descobrir os assuntos da semana"):
             - Se você usar uma ironia sobre dinheiro no par 1, use uma ironia sobre tempo no par 2, e sobre o algoritmo no par 3.
 
             resumo_fofoca:
-            - Escreva em no máximo 3 linhas.
+            - Escreva em ate 5 linhas.
             - Fale com o tom de deboche de quem está revirando os olhos para a futilidade da situação.
             - NUNCA so repita o título. Traduza a fofoca para a linguagem de quem está fofocando no WhatsApp e principalmente leia a reportagem nao invente e so repita o titulo.
             
             resumo_seria:
-            - Escreva em no máximo 3 linhas.
+            - Escreva em ate 5 linhas.
             - OBRIGATÓRIO: Explique como essa notícia afeta o dia a dia do brasileiro comum.
             - Fuja do juridiquês. Em vez de "Projeto de lei foi apresentado", use "Se isso virar lei, a prática muda para..."
             - Se o 'conteudo' estiver vazio ou for inútil interprete e tente detectar ironia, nunca deduza o impacto prático apenas pelo título. NUNCA so repita o título.
