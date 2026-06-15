@@ -298,20 +298,20 @@ if st.session_state.get("dados_prontos"):
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── QUEM SOMOS ────────────────────────────────────────────────────────────────
-# ── QUEM SOMOS ────────────────────────────────────────────────────────────────
 quem_html = (
     '<div class="quem-wrap">'
     '<div class="quem-eyebrow">O projeto</div>'
     '<div class="quem-title">Quem somos</div>'
-    '<div class="quem-pergunta">Mas por que a Cortina de Fumaça?</div>'
-    '<div class="quem-cards">'
+
+    # Fotos entre o título e a pergunta
+    '<div class="quem-cards" style="margin-top:2rem;margin-bottom:2rem;">'
     '<div class="quem-card">'
     '<img src="data:image/jpeg;base64,' + foto_bianca + '" '
     'style="width:110px;height:110px;border-radius:50%;'
     'object-fit:cover;object-position:center top;'
     'border:3px solid #C0392B;margin:0 auto 0.75rem;display:block;">'
     '<div class="quem-nome">Bianca Nunes</div>'
-    '<div class="quem-role">Criadora</div>'
+    '<div class="quem-role">Co-criadora</div>'
     '</div>'
     '<div class="quem-card">'
     '<img src="data:image/jpeg;base64,' + foto_mariana + '" '
@@ -319,17 +319,26 @@ quem_html = (
     'object-fit:cover;object-position:center top;'
     'border:3px solid #C0392B;margin:0 auto 0.75rem;display:block;">'
     '<div class="quem-nome">Mariana Gontijo</div>'
-    '<div class="quem-role">Criadora</div>'
+    '<div class="quem-role">Co-criadora</div>'
     '</div>'
     '</div>'
+
+    # Pergunta com a mesma fonte de "Quem somos" (Playfair Display)
+    '<div style="font-family:\'Playfair Display\', serif;font-size:clamp(22px,3vw,32px);'
+    'font-weight:700;color:#C8B8A2;margin:0 auto 2.5rem;max-width:520px;line-height:1.4;">'
+    'Mas por que a Cortina de Fumaça?'
+    '</div>'
+
     '<div class="quem-missao">'
-    'Vivemos numa era em que o algoritmo decide o que merece atenção e muitas vezes, '
-    'o que mais viraliza é o que menos importa. '
-    'Por isso a Cortina de Fumaça nasceu, para mostrar esse contraste: ao lado de cada fofoca que dominou os feeds,'
-    'há uma notícia séria que passou quase despercebida. '
+    'Vivemos numa era em que o algoritmo decide o que merece atenção — e muitas vezes, '
+    'o que mais viraliza é o que menos importa. 
+    'A Cortina de Fumaça nasceu para mostrar esse contraste: 
+    'ao lado de cada fofoca que dominou os feeds, há uma notícia séria que passou quase despercebida. '
     'Porque saber que existe uma cortina é o primeiro passo para enxergar além dela.'
     '</div>'
-    '<div class="quem-fgv">'
+
+    # Rodapé FGV em bege
+    '<div class="quem-fgv" style="color:#C8B8A2;">'
     'Matéria de Comunicação, Filosofia &amp; Tecnologia — IA<br>'
     'Prof. Luis Gustavo de Oliveira Rodrigues<br>'
     'Escola de Comunicação DiGital FGV-RIO'
