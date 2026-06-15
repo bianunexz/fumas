@@ -81,7 +81,7 @@ if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Lendo matérias e mapeando o ecossistema de notícias (Isso pode levar alguns segundos)..."):
         try:
             # Pede 20 notícias ao Google para ter margem de exclusão
-            fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "assumiu" OR "Comentou" OR "respondeu" OR "Famosos"', "F", max_itens=20)
+            fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "Comentou" OR "respondeu" OR "Famosos" OR "influencer"', "F", max_itens=20)
             serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", max_itens=20)
 
             if not fofocas_brutas or not serias_brutas:
@@ -114,7 +114,7 @@ if st.button("Descobrir os assuntos da semana"):
 
             resumo_fofoca:
             - Escreva um mini parágrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que DE FATO aconteceu. 
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que aconteceu na noticia sem inventar nada e de uma forma que todos entendam. 
             - Se não for tragédia, pode usar tom de deboche sobre a futilidade do assunto. NUNCA só repita o título.
             
             resumo_seria:
