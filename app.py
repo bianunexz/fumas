@@ -128,4 +128,8 @@ if st.session_state.get("dados_prontos"):
                 st.markdown(f"**{seria['titulo']}**")
                 st.markdown(f"{par.get('resumo_seria')}")
                 st.markdown(f"[🔗 Ler a notícia]({seria['link']})")
+                
+                st.write("---")
+                # A PERGUNTA QUE VOCÊ QUERIA:
+                st.info(f"🤔 **Para pensar:** {par.get('pergunta_reflexiva')}")
                 st.write("---")
