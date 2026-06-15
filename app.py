@@ -85,11 +85,11 @@ if st.button("Descobrir os assuntos da semana"):
             REGRAS DE OURO:
             1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
             
-            2. RESUMO DA FOFOCA: Use um tom ácido, informal e cínico. Destaque como o sensacionalismo foi construído para prender a atenção.
+            2. RESUMO DA FOFOCA: Use um tom ácido, informal e cínico. Destaque como o sensacionalismo foi construído para prender a atenção não so repita o titulo da noticia.
             
-            3. RESUMO SÉRIO: Explique a notícia política de forma clara, focando no impacto real na vida da pessoas.
+            3. RESUMO SÉRIO: Explique a notícia política de forma clara, focando no impacto real dela na vida da pessoas não so repita o titulo da noticia.
             
-            4. PERGUNTA REFLEXIVA: Crie uma pergunta provocativa que confronte o usuário sobre a sua escolha de atenção. A pergunta pode relacionar o conteúdo da fofoca (o babado) com a notícia séria (o fato institucional). Exemplo: 'Será que o preço que você paga pela fofoca é a sua cegueira sobre esse projeto de lei?'
+            4. PERGUNTA REFLEXIVA: Crie uma pergunta provocativa que confronte o usuário sobre a sua escolha de atenção. A pergunta pode relacionar o conteúdo da fofoca (o babado) com a notícia séria (o fato institucional). Exemplo:'Para pensar: Será que a nossa fofoca é mais interessante do que a renegociação de dívidas rurais que pode afetar a vida de milhares de pessoas?'
             
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria, pergunta_reflexiva.
             Dados: {fofocas_dieta} | {serias_dieta}
