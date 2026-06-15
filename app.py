@@ -101,7 +101,7 @@ if st.button("Descobrir os assuntos da semana"):
             serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_novas]
 
             # Prompt ajustado para leitura profunda, detecção de ironia e resumos maiores
-           prompt = f"""Você é um estrategista de comunicação digital. 
+               prompt = f"""Você é um estrategista de comunicação digital. 
 
             Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria da mesma semana.
 
