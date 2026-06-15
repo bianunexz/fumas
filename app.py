@@ -9,221 +9,121 @@ from bs4 import BeautifulSoup
 
 st.set_page_config(
     page_title="Cortina de Fumaça",
-    page_icon="🌫️",
+    page_icon="🗞️",
     layout="wide"
 )
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Dancing+Script:wght@600&family=Inter:wght@400;500&display=swap');
 
-/* Reset & base */
-[data-testid="stAppViewContainer"] {
-    background-color: #0D0D0D;
-}
-[data-testid="stHeader"] {
-    background-color: #0D0D0D;
-}
-[data-testid="stSidebar"] {
-    background-color: #111111;
-}
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 4rem;
-    max-width: 960px;
-}
+html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
+[data-testid="stHeader"] { background: transparent; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
+#MainMenu, footer { visibility: hidden; }
 
-/* Hero */
 .hero {
+    background: #1a1a1a;
+    background-image: linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.8) 100%),
+                      url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80');
+    background-size: cover;
+    background-position: center top;
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 3.5rem 1rem 2rem;
-    border-bottom: 1px solid #2a2a2a;
-    margin-bottom: 2.5rem;
+    padding: 4rem 2rem 3rem;
 }
 .hero-eyebrow {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
+    font-weight: 500;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #FF4B1F;
-    margin-bottom: 0.75rem;
+    color: #C8B8A2;
+    margin-bottom: 1.25rem;
 }
 .hero-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(56px, 10vw, 96px);
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(56px, 10vw, 110px);
     color: #F5F0E8;
-    line-height: 0.95;
-    letter-spacing: 0.02em;
-    margin: 0 0 0.5rem;
+    line-height: 0.92;
+    margin: 0 0 0.15em;
 }
-.hero-title span {
-    color: #FF4B1F;
-}
+.hero-title-red { color: #C0392B; }
+.hero-divider { width: 48px; height: 2px; background: #C0392B; margin: 0.5rem auto 1.25rem; }
 .hero-sub {
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    color: #6B6B6B;
-    max-width: 480px;
-    margin: 0.75rem auto 0;
-    line-height: 1.6;
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(22px, 3.5vw, 36px);
+    color: #C8B8A2;
+    margin: 0 0 2.5rem;
+    line-height: 1.5;
 }
 
-/* Botão principal */
 div[data-testid="stButton"] > button {
-    background-color: #FF4B1F !important;
+    font-family: 'Playfair Display', serif !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
     color: #F5F0E8 !important;
+    background: #C0392B !important;
     border: none !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    letter-spacing: 0.05em !important;
-    text-transform: uppercase !important;
-    padding: 0.75rem 2rem !important;
-    border-radius: 2px !important;
+    border-radius: 0 !important;
+    padding: 0.9rem 2.5rem !important;
+    letter-spacing: 0.02em !important;
     cursor: pointer !important;
-    transition: background 0.2s !important;
-    width: auto !important;
 }
-div[data-testid="stButton"] > button:hover {
-    background-color: #e03d10 !important;
-}
+div[data-testid="stButton"] > button:hover { background: #96281B !important; }
 
-/* Container do botão centralizado */
-.btn-center {
-    display: flex;
-    justify-content: center;
-    margin: 1.5rem 0 2.5rem;
-}
-
-/* Card de notícia (fofoca) */
-.noticia-card {
-    background: #161616;
-    border: 1px solid #2a2a2a;
-    border-radius: 4px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 0.75rem;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-}
-.noticia-card:hover {
-    border-color: #FF4B1F;
+.datebar {
     background: #1a1a1a;
-}
-.noticia-tag {
+    color: #6B6050;
     font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
+    font-size: 11px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #FF4B1F;
-    margin-bottom: 0.4rem;
-}
-.noticia-titulo {
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    color: #F5F0E8;
-    line-height: 1.4;
-    margin: 0;
-}
-.noticia-meta {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    color: #4a4a4a;
-    margin-top: 0.5rem;
+    text-align: center;
+    padding: 0.65rem 1rem;
 }
 
-/* Secção de revelação */
-.reveal-section {
-    background: #111111;
-    border-left: 3px solid #FF4B1F;
-    border-radius: 0 4px 4px 0;
-    padding: 1.5rem 1.75rem;
-    margin: 0.5rem 0 1.5rem;
-}
-.reveal-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
-    letter-spacing: 0.2em;
-    color: #FF4B1F;
-    margin-bottom: 0.75rem;
-}
-.reveal-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #A0A0A0;
-    line-height: 1.7;
-    margin-bottom: 0.5rem;
-}
-.reveal-link {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    color: #4a4a4a;
-    text-decoration: none;
-}
+.noticias-wrap { background: #F5F0E8; max-width: 800px; margin: 0 auto; padding: 3rem 2rem 4rem; }
+.section-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.3rem; }
+.section-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 38px; color: #1a1a1a; margin: 0; }
+.rule-thick { border: none; border-top: 2.5px solid #1a1a1a; margin: 0.75rem 0 0; }
+.rule-thin { border: none; border-top: 0.5px solid #D4C9BC; margin: 0; }
 
-/* Divisor entre pares */
-.par-divider {
-    border: none;
-    border-top: 1px solid #1e1e1e;
-    margin: 0.5rem 0 1.25rem;
-}
+.item-row { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem 0 0.6rem; }
+.item-num { font-family: 'Playfair Display', serif; font-size: 11px; color: #C0392B; font-weight: 700; min-width: 24px; padding-top: 3px; letter-spacing: 0.05em; }
+.item-titulo { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.35; margin: 0 0 0.25rem; }
+.item-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: #9A8F82; }
+.item-arrow { margin-left: auto; font-size: 16px; color: #C8B8A2; padding-top: 3px; flex-shrink: 0; }
 
-/* Caixa reflexiva */
-.reflexao-box {
-    background: #0a0a0a;
-    border: 1px solid #2a2a2a;
-    border-radius: 4px;
-    padding: 1rem 1.5rem;
-    margin: 0.5rem 0 1.5rem;
-}
-.reflexao-box p {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #6B6B6B;
-    line-height: 1.6;
-    margin: 0;
-    font-style: italic;
-}
+.reveal-wrap { background: #1a1a1a; padding: 2rem 2rem 1.75rem; margin-bottom: 0.25rem; }
+.reveal-col-label { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.label-red { color: #C0392B; }
+.label-gray { color: #6B6050; }
+.reveal-titulo { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #F5F0E8; line-height: 1.4; margin: 0 0 0.5rem; }
+.reveal-text { font-family: 'Inter', sans-serif; font-size: 13px; color: #9A8F82; line-height: 1.75; margin: 0 0 0.6rem; }
+.reveal-link { font-family: 'Inter', sans-serif; font-size: 11px; color: #C0392B; text-decoration: none; letter-spacing: 0.05em; }
+.reveal-inner { display: flex; gap: 0; align-items: stretch; }
+.col-sep { width: 1px; background: #2e2e2e; flex-shrink: 0; margin: 0 1.5rem; }
+.reflexao { font-family: 'Dancing Script', cursive; font-size: 19px; color: #C8B8A2; line-height: 1.5; border-top: 1px solid #2e2e2e; margin-top: 1.5rem; padding-top: 1.25rem; font-style: italic; }
 
-/* Cabeçalho de seção */
-.section-header {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    color: #F5F0E8;
-    letter-spacing: 0.04em;
-    margin: 2rem 0 1rem;
-    border-bottom: 1px solid #2a2a2a;
-    padding-bottom: 0.5rem;
-}
+.quem-wrap { background: #1a1a1a; padding: 4.5rem 2rem 5rem; text-align: center; }
+.quem-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.5rem; }
+.quem-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 40px; color: #F5F0E8; margin: 0 0 0.75rem; }
+.quem-pergunta { font-family: 'Dancing Script', cursive; font-size: 27px; color: #C8B8A2; margin: 0 auto 2.5rem; max-width: 520px; line-height: 1.4; }
+.quem-cards { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.quem-card { text-align: center; }
+.quem-foto-placeholder { width: 110px; height: 110px; border-radius: 50%; background: #2a2a2a; border: 3px solid #C0392B; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 32px; color: #C8B8A2; }
+.quem-nome { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; color: #F5F0E8; margin-bottom: 0.2rem; }
+.quem-role { font-family: 'Inter', sans-serif; font-size: 11px; color: #6B6050; letter-spacing: 0.12em; text-transform: uppercase; }
+.quem-missao { font-family: 'Inter', sans-serif; font-size: 14px; color: #9A8F82; line-height: 1.85; max-width: 560px; margin: 0 auto 2rem; }
+.quem-fgv { font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #3a3028; border-top: 1px solid #2e2e2e; padding-top: 1.5rem; max-width: 480px; margin: 0 auto; line-height: 2; }
 
-/* Notícia séria */
-.seria-titulo {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #F5F0E8;
-    margin: 0 0 0.5rem;
-    line-height: 1.4;
-}
-.seria-resumo {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #7a7a7a;
-    line-height: 1.7;
-}
-
-/* Spinner */
-[data-testid="stSpinner"] p {
-    font-family: 'Inter', sans-serif !important;
-    color: #6B6B6B !important;
-    font-size: 13px !important;
-}
-
-/* Esconder elementos padrão do Streamlit */
-#MainMenu, footer, header {visibility: hidden;}
+[data-testid="stSpinner"] p { font-family: 'Inter', sans-serif !important; color: #9A8F82 !important; font-size: 13px !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -233,197 +133,194 @@ def formatar_data(data_rss):
     try:
         dt = parsedate_to_datetime(data_rss)
         meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
-        return f"{dt.day} {meses[dt.month - 1]}"
+        return f"{dt.day} {meses[dt.month-1]}"
     except:
         return "Esta semana"
 
 def extrair_texto_noticia(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=4) as response:
-            html = response.read()
+        with urllib.request.urlopen(req, timeout=4) as r:
+            html = r.read()
         soup = BeautifulSoup(html, "html.parser")
-        paragrafos = soup.find_all('p')
-        texto = " ".join([p.get_text(strip=True) for p in paragrafos[:3]])
-        return texto if len(texto) > 20 else "Conteúdo não disponível. Baseie-se apenas no título."
+        texto = " ".join([p.get_text(strip=True) for p in soup.find_all('p')[:3]])
+        return texto if len(texto) > 20 else "Conteúdo não disponível."
     except:
-        return "Conteúdo não extraído. Baseie-se apenas no título."
+        return "Conteúdo não extraído."
 
-def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20):
+def buscar_no_google_news(termo, prefixo, max_itens=20):
     try:
-        termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
-        url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req) as response:
-            xml_data = response.read()
-        root = ET.fromstring(xml_data)
-        itens = root.findall(".//item")
-        amostra = itens[:max_itens]
+        url = f"https://news.google.com/rss/search?q={urllib.parse.quote(termo+' when:7d')}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req) as r:
+            root = ET.fromstring(r.read())
         noticias = []
-        for i, item in enumerate(amostra):
-            titulo_completo = item.find("title").text
-            if " - " in titulo_completo:
-                titulo = titulo_completo.rsplit(" - ", 1)[0]
-                veiculo = titulo_completo.rsplit(" - ", 1)[-1]
-            else:
-                titulo = titulo_completo
-                veiculo = "Portal de Notícias"
+        for i, item in enumerate(root.findall(".//item")[:max_itens]):
+            t = item.find("title").text
+            titulo, veiculo = (t.rsplit(" - ",1)[0], t.rsplit(" - ",1)[-1]) if " - " in t else (t, "Portal")
             link = item.find("link").text
-            noticias.append({
-                "id": f"{prefixo_id}{i}",
-                "titulo": titulo,
-                "veiculo": veiculo,
-                "link": link,
-                "data": formatar_data(item.find("pubDate").text),
-                "conteudo": extrair_texto_noticia(link)[:600]
-            })
+            noticias.append({"id": f"{prefixo}{i}", "titulo": titulo, "veiculo": veiculo, "link": link,
+                             "data": formatar_data(item.find("pubDate").text),
+                             "conteudo": extrair_texto_noticia(link)[:600]})
         return noticias
     except:
         return []
 
-# ── Hero ──────────────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="hero">
-    <div class="hero-eyebrow">Mídia & Realidade</div>
-    <div class="hero-title">CORTINA<br>DE <span>FUMAÇA</span></div>
-    <p class="hero-sub">Nem tudo que domina sua timeline é o que mais impacta sua vida.</p>
-</div>
-""", unsafe_allow_html=True)
-
 if "dados_prontos" not in st.session_state:
     st.session_state.dados_prontos = False
     st.session_state.titulos_exibidos = []
+if "aberto" not in st.session_state:
+    st.session_state.aberto = None
 
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    descobrir = st.button("🔍 Rasgue a cortina desta semana", use_container_width=True)
+# ── HERO ──────────────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="hero">
+    <div class="hero-eyebrow">Uma leitura diferente do seu feed</div>
+    <div class="hero-title">CORTINA<br>DE <span class="hero-title-red">FUMAÇA</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-sub">Nem tudo que domina sua timeline<br>é o que mais importa sua vida.</div>
+</div>
+""", unsafe_allow_html=True)
 
-if descobrir:
-    with st.spinner("Mapeando o ecossistema de notícias..."):
-        try:
-            fofocas_brutas = buscar_no_google_news(
-                '"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "Comentou" OR "respondeu" OR "Famosos" OR "influencer"',
-                "F", max_itens=20
-            )
-            serias_brutas = buscar_no_google_news(
-                "projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública",
-                "S", max_itens=20
-            )
+c1, c2, c3 = st.columns([1, 1.4, 1])
+with c2:
+    if st.button("O que aconteceu essa semana?", use_container_width=True):
+        with st.spinner("Lendo o noticiário da semana..."):
+            try:
+                fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "respondeu" OR "Famosos" OR "influencer"', "F", 20)
+                serias_brutas  = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", 20)
+                if not fofocas_brutas or not serias_brutas:
+                    st.error("Busca falhou. Tente novamente.")
+                    st.stop()
 
-            if not fofocas_brutas or not serias_brutas:
-                st.error("O buscador falhou. Tente novamente.")
-                st.stop()
+                ja = st.session_state.titulos_exibidos
+                fn = [f for f in fofocas_brutas if f["titulo"] not in ja][:5]
+                sn = [s for s in serias_brutas  if s["titulo"] not in ja][:5]
+                st.session_state.fofocas_originais = {f["id"]: f for f in fn}
+                st.session_state.serias_originais  = {s["id"]: s for s in sn}
 
-            ja_exibidos = st.session_state.titulos_exibidos
-            fofocas_novas = [f for f in fofocas_brutas if f["titulo"] not in ja_exibidos][:5]
-            serias_novas  = [s for s in serias_brutas  if s["titulo"] not in ja_exibidos][:5]
+                fd = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fn]
+                sd = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in sn]
 
-            st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_novas}
-            st.session_state.serias_originais  = {s["id"]: s for s in serias_novas}
+                prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
+Crie 5 pares ligando fofoca a notícia séria.
+FOFOCAS: {json.dumps(fd, ensure_ascii=False)}
+NOTÍCIAS SÉRIAS: {json.dumps(sd, ensure_ascii=False)}
+Para cada par: id_fofoca, resumo_fofoca (2 frases, tom adequado ao conteúdo), id_seria, resumo_seria (2 frases didáticas), pergunta_reflexiva (específica, mencione ambos os assuntos, não culpe o público).
+JSON apenas: {{"pares": [{{"id_fofoca":"","resumo_fofoca":"","id_seria":"","resumo_seria":"","pergunta_reflexiva":""}}]}}"""
 
-            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fofocas_novas]
-            serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_novas]
+                r = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[{"role":"user","content":prompt}],
+                    temperature=0.5, response_format={"type":"json_object"}
+                )
+                st.session_state.resultado = json.loads(r.choices[0].message.content)
+                for par in st.session_state.resultado.get("pares",[]):
+                    fo = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
+                    so = st.session_state.serias_originais.get(par.get("id_seria"))
+                    if fo: st.session_state.titulos_exibidos.append(fo["titulo"])
+                    if so: st.session_state.titulos_exibidos.append(so["titulo"])
+                st.session_state.dados_prontos = True
+                st.session_state.aberto = None
+                st.rerun()
+            except Exception as e:
+                st.error(f"Erro: {e}")
 
-            prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
-
-Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
-
-FOFOCAS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
-NOTÍCIAS SÉRIAS: {json.dumps(serias_dieta, ensure_ascii=False)}
-
-Para cada par, preencha:
-
-- id_fofoca / id_seria: os IDs dos itens escolhidos
-
-- resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
-  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
-  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
-  Se for morte ou luto: tom sério e respeitoso, sem ironia.
-  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
-  Se for fofoca comum: tom levemente irônico sobre a futilidade.
-
-- resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
-
-- pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
-  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
-  PROIBIDO: perguntas genéricas como "o que é mais importante para você?" ou "passado vs futuro?".
-  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
-  PROIBIDO: culpar o público por ter empatia com tragédias — critique a máquina de cliques, não as pessoas.
-  Varie o formato da pergunta em cada par.
-
-Retorne APENAS JSON válido:
-{{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
-
-            resposta = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5,
-                response_format={"type": "json_object"}
-            )
-
-            st.session_state.resultado = json.loads(resposta.choices[0].message.content)
-
-            for par in st.session_state.resultado.get("pares", []):
-                f_obj = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
-                if f_obj:
-                    st.session_state.titulos_exibidos.append(f_obj["titulo"])
-                s_obj = st.session_state.serias_originais.get(par.get("id_seria"))
-                if s_obj:
-                    st.session_state.titulos_exibidos.append(s_obj["titulo"])
-
-            st.session_state.dados_prontos = True
-
-        except Exception as e:
-            st.error(f"Erro ao processar: {e}")
-
-# ── Exibição ──────────────────────────────────────────────────────────────────
+# ── NOTÍCIAS ──────────────────────────────────────────────────────────────────
 if st.session_state.get("dados_prontos"):
-    st.markdown('<div class="section-header">Em alta esta semana</div>', unsafe_allow_html=True)
+    from datetime import datetime
+    hoje = datetime.now()
+    meses_pt = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]
+    st.markdown(f'<div class="datebar">{hoje.day} de {meses_pt[hoje.month-1]} de {hoje.year}</div>', unsafe_allow_html=True)
 
-    for idx, par in enumerate(st.session_state.resultado.get("pares", [])):
+    st.markdown('<div class="noticias-wrap">', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="section-eyebrow">Em alta agora</div>
+        <div class="section-title">Edição da semana</div>
+        <hr class="rule-thick">
+    """, unsafe_allow_html=True)
+
+    for idx, par in enumerate(st.session_state.resultado.get("pares",[])):
         fofoca = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
         seria  = st.session_state.serias_originais.get(par.get("id_seria"))
-
         if not fofoca or not seria:
             continue
 
-        # Card clicável da fofoca
         st.markdown(f"""
-        <div class="noticia-card">
-            <div class="noticia-tag">🔥 Bombando</div>
-            <p class="noticia-titulo">{fofoca['titulo']}</p>
-            <div class="noticia-meta">{fofoca['data']} &nbsp;·&nbsp; {fofoca['veiculo']}</div>
+        <div class="item-row">
+            <div class="item-num">0{idx+1}</div>
+            <div style="flex:1">
+                <div class="item-titulo">{fofoca['titulo']}</div>
+                <div class="item-meta">{fofoca['data']} &nbsp;·&nbsp; {fofoca['veiculo']}</div>
+            </div>
+            <div class="item-arrow">→</div>
         </div>
         """, unsafe_allow_html=True)
 
-        with st.expander("Ver o que está por baixo ↓", expanded=False):
-            col_f, col_s = st.columns(2, gap="large")
+        ca, cb, cc = st.columns([0.12, 1, 0.12])
+        with cb:
+            lbl = "▲ Fechar" if st.session_state.aberto == idx else "▼ Ver o que estava por baixo"
+            if st.button(lbl, key=f"t{idx}", use_container_width=True):
+                st.session_state.aberto = None if st.session_state.aberto == idx else idx
+                st.rerun()
 
-            with col_f:
-                st.markdown(f"""
-                <div style="margin-bottom: 0.5rem;">
-                    <div class="reveal-label">📢 Por que bombou</div>
-                    <div class="reveal-text">{par.get('resumo_fofoca')}</div>
-                    <a href="{fofoca['link']}" target="_blank" class="reveal-link">→ Ver na fonte</a>
-                </div>
-                """, unsafe_allow_html=True)
-
-            with col_s:
-                st.markdown(f"""
-                <div style="border-left: 3px solid #2a2a2a; padding-left: 1.25rem;">
-                    <div class="reveal-label">🌫️ Enquanto isso</div>
-                    <div class="seria-titulo">{seria['titulo']}</div>
-                    <div class="seria-resumo">{par.get('resumo_seria')}</div>
-                    <a href="{seria['link']}" target="_blank" class="reveal-link" style="margin-top:0.5rem; display:block;">→ Ler a notícia</a>
-                </div>
-                """, unsafe_allow_html=True)
-
+        if st.session_state.aberto == idx:
             st.markdown(f"""
-            <div class="reflexao-box">
-                <p>🤔 {par.get('pergunta_reflexiva')}</p>
+            <div class="reveal-wrap">
+                <div class="reveal-inner">
+                    <div style="flex:1">
+                        <div class="reveal-col-label label-red">🔥 Por que bombou</div>
+                        <div class="reveal-titulo">{fofoca['titulo']}</div>
+                        <div class="reveal-text">{par.get('resumo_fofoca')}</div>
+                        <a href="{fofoca['link']}" target="_blank" class="reveal-link">→ Ver na fonte</a>
+                    </div>
+                    <div class="col-sep"></div>
+                    <div style="flex:1">
+                        <div class="reveal-col-label label-gray">🌫️ Enquanto isso</div>
+                        <div class="reveal-titulo">{seria['titulo']}</div>
+                        <div class="reveal-text">{par.get('resumo_seria')}</div>
+                        <a href="{seria['link']}" target="_blank" class="reveal-link">→ Ler a notícia</a>
+                    </div>
+                </div>
+                <div class="reflexao">"{par.get('pergunta_reflexiva')}"</div>
             </div>
             """, unsafe_allow_html=True)
 
-        if idx < len(st.session_state.resultado.get("pares", [])) - 1:
-            st.markdown('<hr class="par-divider">', unsafe_allow_html=True)
+        st.markdown('<hr class="rule-thin">', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ── QUEM SOMOS ────────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="quem-wrap">
+    <div class="quem-eyebrow">O projeto</div>
+    <div class="quem-title">Quem somos</div>
+    <div class="quem-pergunta">Mas por que a Cortina de Fumaça?</div>
+
+    <div class="quem-cards">
+        <div class="quem-card">
+            <div class="quem-foto-placeholder">B</div>
+            <div class="quem-nome">Bianca Nunes</div>
+            <div class="quem-role">Co-criadora</div>
+        </div>
+        <div class="quem-card">
+            <div class="quem-foto-placeholder">M</div>
+            <div class="quem-nome">Mariana Gontijo</div>
+            <div class="quem-role">Co-criadora</div>
+        </div>
+    </div>
+
+    <div class="quem-missao">
+        Vivemos numa era em que o algoritmo decide o que merece atenção — e muitas vezes,
+        o que mais viraliza é o que menos importa. A Cortina de Fumaça nasceu para mostrar
+        esse contraste: ao lado de cada fofoca que dominou os feeds, há uma notícia séria
+        que passou quase despercebida. Não para culpar ninguém, mas para abrir uma janela.
+    </div>
+
+    <div class="quem-fgv">
+        Matéria de Comunicação, Filosofia &amp; Tecnologia — IA<br>
+        Prof. Luis Gustavo de Oliveira Rodrigues<br>
+        FGV Escola de Comunicação
+    </div>
+</div>
+""", unsafe_allow_html=True)
