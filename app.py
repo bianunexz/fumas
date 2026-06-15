@@ -81,10 +81,11 @@ if st.button("Descobrir os assuntos da semana"):
             
             prompt = f"""
             Analise os dados e crie entre 3 e 5 PARES DE NOTÍCIAS.
-            REGRAS DE OURO:
+            REGRAS:
             1. NÃO REPITA nenhum título que já foi exibido: {st.session_state.titulos_exibidos}.
-            2. Seja surpreendente: escolha assuntos variados.
-            3. Evite o óbvio e busque o contraste entre o fútil e o urgente.
+            2. FOFOCA: O "resumo_fofoca" deve ser bem informal e ácido, explicando por que o assunto viralizou e virou um "babado".
+            3. SÉRIA: O "resumo_seria" deve explicar o impacto real da notícia na sociedade.
+            
             Retorne APENAS JSON com chave "pares" contendo id_fofoca, resumo_fofoca, id_seria, resumo_seria.
             Dados: {fofocas_dieta} | {serias_dieta}
             """
