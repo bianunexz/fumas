@@ -113,8 +113,8 @@ if st.button("Descobrir os assuntos da semana"):
             CRÍTICO: Você DEVE variar a estrutura de texto em cada par. Seja original em cada um!
 
             resumo_fofoca:
-            - Seja direto, cínico e ágil (máximo de 2 frases).
-            - Estilo: "A influencer falou sobre X, mas a verdade é que ninguém aguenta mais." ou "Fulano postou Y e a internet parou para julgar."
+            - Seja direto, cínico e ágil 
+            - Estilo: "A influencer falou sobre X, mas a verdade é que ninguém perguntou." ou "Fulano postou Y e a internet parou para julgar."
             - NUNCA mencione a notícia séria neste bloco. NUNCA.
             
             resumo_seria:
@@ -124,7 +124,7 @@ if st.button("Descobrir os assuntos da semana"):
             
             pergunta_reflexiva:
             - É aqui que os dois mundos colidem. 
-            - Use a ironia estruturada: "Quem precisa de um [órgão/política] resolvendo [problema sério] quando temos [fofoca] para nos preocupar?" ou "Enquanto a gente dá palco para [fofoca], o [problema sério] passa em branco. Quem ganha com essa distração?"
+            - Use a ironia estruturada: exmplo: "Quem precisa de um [órgão/política] resolvendo [problema sério] quando temos [fofoca] para nos preocupar?" ou "Enquanto a gente dá palco para [fofoca], o [problema sério] passa em branco. Quem ganha com essa distração?"
             - Seja ácido com a falta de atenção do público.
 
             Retorne APENAS JSON válido:
