@@ -114,7 +114,7 @@ if st.button("Descobrir os assuntos da semana"):
 
             resumo_fofoca:
             - Escreva um mini parágrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que aconteceu na noticia sem inventar nada e de uma forma que todos entendam. 
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que aconteceu na noticia mas com base no conteudo raspado e nao só no titulo e identifique ironias e tragedias para saber equilibrar seu tom. 
             - Se não for tragédia, pode usar tom de deboche sobre a futilidade do assunto. NUNCA só repita o título.
             
             resumo_seria:
@@ -123,8 +123,8 @@ if st.button("Descobrir os assuntos da semana"):
             - Explique de forma muito didática como isso afeta a vida, a saúde ou o bolso da sociedade. Sem juridiquês, para que todos entendam.
             
             pergunta_reflexiva:
-            - A pergunta FINAL DEVE SER SEMPRE fazer o usuario pensar:Por exemplo: Por que a sociedade dá milhões de cliques/atenção para [Tema da Fofoca], enquanto ignora o impacto real de [Tema da Notícia Séria]?
-            - Mude a forma de fazer essa pergunta em cada par,pode adotar desse contraste de "atenção inútil vs. assunto importante". Não invente relações que possam ser polemicas (ex: não relacione fisiculturismo com leis de idosos).
+            - A pergunta FINAL DEVE SER SEMPRE fazer o usuario pensar, Por exemplo: Por que a sociedade dá milhões de cliques/atenção para [Tema da Fofoca], enquanto ignora o impacto real de [Tema da Notícia Séria]?
+            - Mude a forma de fazer essa pergunta em cada par,pode adotar desse contraste de "atenção inútil vs. assunto importante". NÃO invente relações que possam ser polemicas (ex: não relacione fisiculturismo com leis de idosos).
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
