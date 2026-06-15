@@ -19,24 +19,21 @@ def formatar_data(data_rss):
     except:
         return "Nesta semana"
 
-# NOVO: Função para o assistente "ler" a matéria com BeautifulSoup
 def extrair_texto_noticia(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        # Timeout curto para não deixar seu site lento se um portal de notícias demorar
         with urllib.request.urlopen(req, timeout=4) as response:
             html = response.read()
         
         soup = BeautifulSoup(html, "html.parser")
         paragrafos = soup.find_all('p')
         
-        # Pega as primeiras linhas de texto para entender o contexto real
         texto = " ".join([p.get_text(strip=True) for p in paragrafos[:3]])
         return texto if len(texto) > 20 else "Conteúdo não disponível. Baseie-se apenas no título."
     except:
         return "Conteúdo não extraído. Baseie-se apenas no título."
 
-def buscar_no_google_news(termo_busca, prefixo_id, max_itens=5): 
+def buscar_no_google_news(termo_busca, prefixo_id, max_itens=20): 
     try:
         termo_codificado = urllib.parse.quote(f"{termo_busca} when:7d")
         url = f"https://news.google.com/rss/search?q={termo_codificado}&hl=pt-BR&gl=BR&ceid=BR:pt-419"
@@ -66,7 +63,7 @@ def buscar_no_google_news(termo_busca, prefixo_id, max_itens=5):
                 "veiculo": veiculo,
                 "link": link,
                 "data": formatar_data(item.find("pubDate").text),
-                "conteudo": extrair_texto_noticia(link)[:600] # Envia 600 caracteres para o modelo não se perder
+                "conteudo": extrair_texto_noticia(link)[:600] 
             })
         return noticias
     except:
@@ -83,51 +80,53 @@ if "dados_prontos" not in st.session_state:
 if st.button("Descobrir os assuntos da semana"):
     with st.spinner("Lendo matérias e mapeando o ecossistema de notícias (Isso pode levar alguns segundos)..."):
         try:
-            fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "assumiu" OR "Comentou" OR "respondeu" OR "Famosos" "', "F", max_itens=5)
-            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", max_itens=5)
+            # Pede 20 notícias ao Google para ter margem de exclusão
+            fofocas_brutas = buscar_no_google_news('"pronunciamento" OR "polêmica" OR "treta" OR "cancelamento" OR "assumiu" OR "Comentou" OR "respondeu" OR "Famosos"', "F", max_itens=20)
+            serias_brutas = buscar_no_google_news("projeto de lei OR investigação OR stf OR senado OR câmara OR operação policial OR política pública", "S", max_itens=20)
 
             if not fofocas_brutas or not serias_brutas:
                 st.error("O buscador falhou. Tente novamente.")
                 st.stop()
 
-            st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_brutas}
-            st.session_state.serias_originais  = {s["id"]: s for s in serias_brutas}
-
-            # Agora mandamos também o "conteúdo" raspado da web para a IA
-            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fofocas_brutas]
-            serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_brutas]
-
             ja_exibidos = st.session_state.titulos_exibidos
 
+            # FILTRO REAL NO CÓDIGO PYTHON: Tira o que já foi lido e seleciona as 5 inéditas
+            fofocas_novas = [f for f in fofocas_brutas if f["titulo"] not in ja_exibidos][:5]
+            serias_novas = [s for s in serias_brutas if s["titulo"] not in ja_exibidos][:5]
 
-           # Prompt com persona, foco em variação e limite de 3 frases
-            prompt = f"""Você é um estrategista de comunicação digital irônico e afiado. 
+            st.session_state.fofocas_originais = {f["id"]: f for f in fofocas_novas}
+            st.session_state.serias_originais  = {s["id"]: s for s in serias_novas}
 
-            Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria que aconteceram na mesma semana.
+            fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fofocas_novas]
+            serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_novas]
+
+            # Prompt ajustado para leitura profunda, detecção de ironia e resumos maiores
+            prompt = f"""Você é um estrategista de comunicação digital irônico e afiado, com faro jornalístico. 
+
+            Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria da mesma semana.
 
             FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
             NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
-            TÍTULOS JÁ EXIBIDOS (não use nenhum): {json.dumps(ja_exibidos, ensure_ascii=False)}
 
-            REGRAS CRÍTICAS PARA NÃO FICAR REPETITIVO:
-            - PROIBIDO usar as mesmas frases, palavras de transição ou estruturas de pergunta em mais de um par.
-            - Se você usar uma ironia sobre dinheiro no par 1, use uma ironia sobre tempo no par 2, e sobre o algoritmo no par 3.
+            REGRAS DE SEGURANÇA E VARIAÇÃO:
+            1. TRAVA DE TRAGÉDIA: Se a notícia envolver MORTE, ACIDENTE, DOENÇA ou CRIME VIOLENTO, ZERO IRONIA nesse resumo. Seja respeitoso e factual.
+            2. NÃO MISTURE PERSONAGENS: A fofoca e a notícia séria não têm relação na vida real.
+            3. VARIEDADE: É expressamente proibido repetir a estrutura das perguntas reflexivas. Mude a abordagem (ex: tempo, dinheiro, alienação) em cada par.
 
             resumo_fofoca:
-            - Escreva em ate 5 linhas.
-            - Fale com o tom de deboche de quem está revirando os olhos para a futilidade da situação.
-            - NUNCA so repita o título. Traduza a fofoca para a linguagem de quem está fofocando no WhatsApp e principalmente leia a reportagem nao invente e so repita o titulo.
+            - Escreva um mini paragrafo.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Títulos geralmente são iscas (clickbait) ou irônicos. Explique o que DE FATO aconteceu com base no texto.
+            - Fale com tom de deboche sobre a futilidade, mas entregue a informação real. NUNCA só repita o título.
             
             resumo_seria:
-            - Escreva em ate 5 linhas.
-            - OBRIGATÓRIO: Explique como essa notícia afeta o dia a dia do brasileiro comum.
-            - Fuja do juridiquês. Em vez de "Projeto de lei foi apresentado", use "Se isso virar lei, a prática muda para..."
-            - Se o 'conteudo' estiver vazio ou for inútil interprete e tente detectar ironia, nunca deduza o impacto prático apenas pelo título. NUNCA so repita o título.
+            - Escreva um mini paragrafo.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado para entender a verdade por trás do título.
+            - Mastigue a informação: explique detalhadamente como essa lei, investigação ou política afeta a vida, a saúde ou o bolso do cidadão.
+            - Seja didático e fuja do juridiquês. NUNCA deduza o impacto só pelo título e NUNCA só repita o título.
             
             pergunta_reflexiva:
-            - Provoque o leitor pode ser misturando as duas notícias ou de outra forma, mas tem que CRIAR UMA ABORDAGEM INÉDITA PARA CADA PAR.
-            - Varie o estilo: por exemplo em uma pergunta, foque no absurdo de valores financeiros; em outra, foque na cegueira do público; em outra, questione a cortina de fumaça da mídia.
-            - NUNCA repita o formato "Quem precisa de X quando se tem Y?". Reinvente a ironia toda vez.
+            - Foque APENAS na nossa economia da atenção e distração coletiva.
+            - CRIE UMA ABORDAGEM INÉDITA PARA CADA PAR. Reinvente a ironia toda vez. NUNCA repita o formato "Quem precisa de X quando se tem Y?".
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
@@ -141,10 +140,14 @@ if st.button("Descobrir os assuntos da semana"):
 
             st.session_state.resultado = json.loads(resposta.choices[0].message.content)
 
+            # Salva no histórico para não repetir nos próximos cliques
             for par in st.session_state.resultado.get("pares", []):
                 f_obj = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
                 if f_obj:
                     st.session_state.titulos_exibidos.append(f_obj["titulo"])
+                s_obj = st.session_state.serias_originais.get(par.get("id_seria"))
+                if s_obj:
+                    st.session_state.titulos_exibidos.append(s_obj["titulo"])
 
             st.session_state.dados_prontos = True
 
