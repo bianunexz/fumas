@@ -125,7 +125,7 @@ if st.button("Descobrir os assuntos da semana"):
             - Se o 'conteudo' estiver vazio ou for inútil interprete e tente detectar ironia, nunca deduza o impacto prático apenas pelo título. NUNCA so repita o título.
             
             pergunta_reflexiva:
-            - Provoque o leitor misturando as duas notícias, mas CRIE UMA ABORDAGEM INÉDITA PARA CADA PAR.
+            - Provoque o leitor pode ser misturando as duas notícias ou de outra forma, mas tem que CRIAR UMA ABORDAGEM INÉDITA PARA CADA PAR.
             - Varie o estilo: por exemplo em uma pergunta, foque no absurdo de valores financeiros; em outra, foque na cegueira do público; em outra, questione a cortina de fumaça da mídia.
             - NUNCA repita o formato "Quem precisa de X quando se tem Y?". Reinvente a ironia toda vez.
 
