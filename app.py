@@ -101,30 +101,32 @@ if st.button("Descobrir os assuntos da semana"):
             serias_dieta  = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in serias_novas]
 
             # Prompt ajustado para leitura profunda, detecção de ironia e resumos maiores
-            prompt = f"""Você é um estrategista de comunicação digital. 
+            prompt = f"""Você é um estrategista de comunicação digital e crítico de mídia. 
 
-            Seu trabalho: criar 5 PARES ligando uma fofoca a uma notícia séria da mesma semana.
+            Seu trabalho: criar 5 PARES ligando uma notícia de entretenimento/fofoca a uma notícia séria da mesma semana.
 
             FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
             NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
 
-            REGRAS DE SEGURANÇA (MÁXIMA PRIORIDADE):
-            1. TRAVA DE TRAGÉDIA TOTAL: Se qualquer das notícias envolver MORTE, ACIDENTE, DOENÇA ou CRIME, é EXPRESSAMENTE PROIBIDO fazer piada, ironia ou qualquer relação absurda na 'pergunta_reflexiva'.
-            2. ECONOMIA DA ATENÇÃO: A fofoca e a notícia séria NÃO TÊM RELAÇÃO na vida real. 
+            REGRAS DE SEGURANÇA E EMPATIA (MÁXIMA PRIORIDADE):
+            1. O VALOR DA VIDA É ABSOLUTO: Se a 'fofoca' envolver morte, luto, doença ou acidente grave, MUDE SEU COMPORTAMENTO. Jamais trate uma perda humana como 'futilidade' ou pergunte por que as pessoas se importam. É natural se importar com vidas.
+            2. ECONOMIA DA ATENÇÃO: A fofoca e a notícia séria NÃO TÊM RELAÇÃO na vida real. Nunca misture os personagens nas suas explicações.
 
             resumo_fofoca:
             - Escreva um mini parágrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que aconteceu na noticia mas com base no conteudo raspado e nao só no titulo e identifique ironias e tragedias para saber equilibrar seu tom. 
-            - Se não for tragédia, pode usar tom de deboche sobre a futilidade do assunto. NUNCA só repita o título.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que aconteceu e leia a noticia nao so interprete o titulo sem entender as ironias.
+            - SE FOR TRAGÉDIA/LUTO: Use um tom 100% respeitoso, sério e jornalístico. Sem ironias.
+            - SE FOR FOFOCA COMUM: Use tom de deboche suave sobre a futilidade do assunto.
             
             resumo_seria:
             - Escreva um mini parágrafo.
             - OBRIGATÓRIO: Leia o 'conteudo' raspado.
-            - Explique de forma muito didática como isso afeta a vida, a saúde ou o bolso da sociedade. Sem juridiquês, para que todos entendam.
+            - Explique de forma muito didática como isso afeta a vida, a saúde ou o bolso da sociedade. Sem juridiquês.
             
             pergunta_reflexiva:
-            - A pergunta FINAL DEVE SER SEMPRE fazer o usuario pensar, Por exemplo: Por que a sociedade dá milhões de cliques/atenção para [Tema da Fofoca], enquanto ignora o impacto real de [Tema da Notícia Séria]?
-            - Mude a forma de fazer essa pergunta em cada par,pode adotar desse contraste de "atenção inútil vs. assunto importante". NÃO invente relações que possam ser polemicas (ex: não relacione fisiculturismo com leis de idosos).
+            - SE A NOTÍCIA ENVOLVER LUTO/TRAGÉDIA: Sua crítica DEVE ser sobre a MÁQUINA DE CLIQUES. (Exemplo: "Por que a internet transforma até a dor e o luto em um espetáculo para gerar engajamento, enquanto projetos como [Notícia Séria] ficam esquecidos no feed?"). Nunca julgue a empatia do público.
+            - SE FOR FOFOCA COMUM: Faça o usuário pensar sobre atenção (Exemplo: "Por que damos milhões de cliques para [Fofoca Inútil], enquanto ignoramos o impacto real de [Notícia Séria]?").
+            - Mude as palavras da pergunta em cada par. Não invente relações de causa e efeito entre os dois assuntos que nao tem nada aver.
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
