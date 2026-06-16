@@ -211,34 +211,34 @@ with c2:
 
  # ── PROMPT ATUALIZADO ──────────────────────────────────────────────
             prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
-
-Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
-
-FOFOCAS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
-NOTÍCIAS SÉRIAS: {json.dumps(serias_dieta, ensure_ascii=False)}
-
-Para cada par, preencha:
-
-- id_fofoca / id_seria: os IDs dos itens escolhidos
-
-- resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
-  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
-  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
-  Se for morte ou luto: tom sério e respeitoso, sem ironia.
-  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
-  Se for fofoca comum: tom levemente irônico sobre a futilidade.
-
-- resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
-
-- pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
-  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
-  PROIBIDO: perguntas genéricas como "o que é mais importante para você?" ou "passado vs futuro?".
-  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
-  PROIBIDO: culpar o público por ter empatia com tragédias — critique a máquina de cliques, não as pessoas.
-  Varie o formato da pergunta em cada par.
-
-Retorne APENAS JSON válido:
-{{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+            
+            Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
+            
+                FOFOCAS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
+                NOTÍCIAS SÉRIAS: {json.dumps(serias_dieta, ensure_ascii=False)}
+                
+                Para cada par, preencha:
+                
+                - id_fofoca / id_seria: os IDs dos itens escolhidos
+                
+                - resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
+                  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
+                  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
+                  Se for morte ou luto: tom sério e respeitoso, sem ironia.
+                  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
+                  Se for fofoca comum: tom levemente irônico sobre a futilidade.
+                
+                - resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
+                
+                - pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
+                  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
+                  PROIBIDO: perguntas genéricas como "o que é mais importante para você?" ou "passado vs futuro?".
+                  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
+                  PROIBIDO: culpar o público por ter empatia com tragédias — critique a máquina de cliques, não as pessoas.
+                  Varie o formato da pergunta em cada par.
+                
+                Retorne APENAS JSON válido:
+                {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
                 r = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=[{"role":"user","content":prompt}],
