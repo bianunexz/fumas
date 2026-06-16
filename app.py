@@ -12,8 +12,9 @@ def img_to_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-foto_bianca   = img_to_base64("bianca_nunes.jpg")
-foto_mariana  = img_to_base64("mariana_gontijo.jpg")
+foto_bianca  = img_to_base64("bianca_nunes.jpg")
+foto_mariana = img_to_base64("mariana_gontijo.jpg")
+
 st.set_page_config(
     page_title="Cortina de Fumaça",
     page_icon="🗞️",
@@ -121,14 +122,12 @@ div[data-testid="stButton"] > button:hover { background: #96281B !important; }
 .quem-wrap { background: #1a1a1a; padding: 4.5rem 2rem 5rem; text-align: center; }
 .quem-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.5rem; }
 .quem-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 40px; color: #F5F0E8; margin: 0 0 0.75rem; }
-.quem-pergunta { font-family: 'Dancing Script', cursive; font-size: 27px; color: #C8B8A2; margin: 0 auto 2.5rem; max-width: 520px; line-height: 1.4; }
 .quem-cards { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .quem-card { text-align: center; }
-.quem-foto-placeholder { width: 110px; height: 110px; border-radius: 50%; background: #2a2a2a; border: 3px solid #C0392B; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 32px; color: #C8B8A2; }
 .quem-nome { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; color: #F5F0E8; margin-bottom: 0.2rem; }
 .quem-role { font-family: 'Inter', sans-serif; font-size: 11px; color: #6B6050; letter-spacing: 0.12em; text-transform: uppercase; }
 .quem-missao { font-family: 'Inter', sans-serif; font-size: 14px; color: #9A8F82; line-height: 1.85; max-width: 560px; margin: 0 auto 2rem; }
-.quem-fgv { font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #3a3028; border-top: 1px solid #2e2e2e; padding-top: 1.5rem; max-width: 480px; margin: 0 auto; line-height: 2; }
+.quem-fgv { font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8B8A2; border-top: 1px solid #2e2e2e; padding-top: 1.5rem; max-width: 480px; margin: 0 auto; line-height: 2; }
 
 [data-testid="stSpinner"] p { font-family: 'Inter', sans-serif !important; color: #9A8F82 !important; font-size: 13px !important; }
 </style>
@@ -209,43 +208,43 @@ with c2:
                 fd = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fn]
                 sd = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in sn]
 
- # ── PROMPT ATUALIZADO ──────────────────────────────────────────────
-            prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
-            
-            Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
-            
-                FOFOCAS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
-                NOTÍCIAS SÉRIAS: {json.dumps(serias_dieta, ensure_ascii=False)}
-                
-                Para cada par, preencha:
-                
-                - id_fofoca / id_seria: os IDs dos itens escolhidos
-                
-                - resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
-                  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
-                  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
-                  Se for morte ou luto: tom sério e respeitoso, sem ironia.
-                  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
-                  Se for fofoca comum: tom levemente irônico sobre a futilidade.
-                
-                - resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
-                
-                - pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
-                  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
-                  PROIBIDO: perguntas genéricas como "o que é mais importante para você?" ou "passado vs futuro?".
-                  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
-                  PROIBIDO: culpar o público por ter empatia com tragédias — critique a máquina de cliques, não as pessoas.
-                  Varie o formato da pergunta em cada par.
-                
-                Retorne APENAS JSON válido:
-                {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+                prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
+
+Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
+
+FOFOCAS: {json.dumps(fd, ensure_ascii=False)}
+NOTÍCIAS SÉRIAS: {json.dumps(sd, ensure_ascii=False)}
+
+Para cada par, preencha:
+
+- id_fofoca / id_seria: os IDs dos itens escolhidos
+
+- resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
+  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
+  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título.
+  Se for morte ou luto: tom sério e respeitoso, sem ironia.
+  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
+  Se for fofoca comum: tom levemente irônico sobre a futilidade.
+
+- resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
+
+- pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
+  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria.
+  PROIBIDO: perguntas genéricas como "o que é mais importante para você?".
+  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
+  PROIBIDO: culpar o público por ter empatia com tragédias.
+  Varie o formato da pergunta em cada par.
+
+Retorne APENAS JSON válido:
+{{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
+
                 r = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
-                    messages=[{"role":"user","content":prompt}],
-                    temperature=0.5, response_format={"type":"json_object"}
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.5, response_format={"type": "json_object"}
                 )
                 st.session_state.resultado = json.loads(r.choices[0].message.content)
-                for par in st.session_state.resultado.get("pares",[]):
+                for par in st.session_state.resultado.get("pares", []):
                     fo = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
                     so = st.session_state.serias_originais.get(par.get("id_seria"))
                     if fo: st.session_state.titulos_exibidos.append(fo["titulo"])
@@ -270,7 +269,7 @@ if st.session_state.get("dados_prontos"):
         <hr class="rule-thick">
     """, unsafe_allow_html=True)
 
-    for idx, par in enumerate(st.session_state.resultado.get("pares",[])):
+    for idx, par in enumerate(st.session_state.resultado.get("pares", [])):
         fofoca = st.session_state.fofocas_originais.get(par.get("id_fofoca"))
         seria  = st.session_state.serias_originais.get(par.get("id_seria"))
         if not fofoca or not seria:
@@ -326,7 +325,6 @@ quem_html = (
     '<div class="quem-eyebrow">O projeto</div>'
     '<div class="quem-title">Quem somos</div>'
 
-    # Fotos entre o título e a pergunta
     '<div class="quem-cards" style="margin-top:2rem;margin-bottom:2rem;">'
     '<div class="quem-card">'
     '<img src="data:image/jpeg;base64,' + foto_bianca + '" '
@@ -346,7 +344,6 @@ quem_html = (
     '</div>'
     '</div>'
 
-    # Pergunta com a mesma fonte de "Quem somos" (Playfair Display)
     '<div style="font-family:\'Playfair Display\', serif;font-size:clamp(22px,3vw,32px);'
     'font-weight:700;color:#C8B8A2;margin:0 auto 2.5rem;max-width:520px;line-height:1.4;">'
     'Mas por que a Cortina de Fumaça?'
@@ -354,14 +351,13 @@ quem_html = (
 
     '<div class="quem-missao">'
     'Vivemos numa era em que o algoritmo decide o que merece atenção — e muitas vezes, '
-    'o que mais viraliza é o que menos importa. '
-    'A Cortina de Fumaça nasceu para mostrar esse contraste: '
-    'ao lado de cada fofoca que dominou os feeds, há uma notícia séria que passou quase despercebida. '
+    'o que mais viraliza é o que menos importa. A Cortina de Fumaça nasceu para mostrar '
+    'esse contraste: ao lado de cada fofoca que dominou os feeds, há uma notícia séria '
+    'que passou quase despercebida. '
     'Porque saber que existe uma cortina é o primeiro passo para enxergar além dela.'
     '</div>'
 
-    # Rodapé FGV em bege
-    '<div class="quem-fgv" style="color:#C8B8A2;">'
+    '<div class="quem-fgv">'
     'Matéria de Comunicação, Filosofia &amp; Tecnologia — IA<br>'
     'Prof. Luis Gustavo de Oliveira Rodrigues<br>'
     'Escola de Comunicação DiGital FGV-RIO'
