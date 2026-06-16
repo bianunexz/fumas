@@ -208,36 +208,35 @@ with c2:
                 fd = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fn]
                 sd = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in sn]
 
-                prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente.
+                prompt = f"""Você é um estrategista de comunicação digital e crítico de mídia. 
 
-Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria.
+            Seu trabalho: criar 5 PARES ligando uma notícia de entretenimento/fofoca a uma notícia séria da mesma semana.
 
-FOFOCAS: {json.dumps(fd, ensure_ascii=False)}
-NOTÍCIAS SÉRIAS: {json.dumps(sd, ensure_ascii=False)}
+            FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
+            NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
 
-Para cada par, preencha:
+            REGRAS DE SEGURANÇA E EMPATIA (MÁXIMA PRIORIDADE):
+            1. O VALOR DA VIDA É ABSOLUTO: Se a 'fofoca' envolver morte, luto, doença ou acidente grave, MUDE SEU COMPORTAMENTO. Jamais trate uma perda humana como 'futilidade' ou pergunte por que as pessoas se importam. É natural se importar com vidas.
+            2. ECONOMIA DA ATENÇÃO: A fofoca e a notícia séria NÃO TÊM RELAÇÃO na vida real. Nunca misture os personagens nas suas explicações.
 
-- id_fofoca / id_seria: os IDs dos itens escolhidos
+            resumo_fofoca:
+            - Escreva um mini parágrafo.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que de fato aconteceu.
+            - SE FOR TRAGÉDIA/LUTO: Use um tom 100% respeitoso, sério e jornalístico. Sem ironias.
+            - SE FOR FOFOCA COMUM: Use tom de deboche suave sobre a futilidade do assunto.
+            
+            resumo_seria:
+            - Escreva um mini parágrafo.
+            - OBRIGATÓRIO: Leia o 'conteudo' raspado.
+            - Explique de forma muito didática como isso afeta a vida, a saúde ou o bolso da sociedade. Sem juridiquês.
+            
+            pergunta_reflexiva:
+            - SE A NOTÍCIA ENVOLVER LUTO/TRAGÉDIA: Sua crítica DEVE ser sobre a MÁQUINA DE CLIQUES. (Exemplo: "Por que a internet transforma até a dor e o luto em um espetáculo para gerar engajamento, enquanto projetos estruturais como [Notícia Séria] ficam escondidos no feed?"). Nunca julgue a empatia do público.
+            - SE FOR FOFOCA COMUM: Faça o usuário pensar sobre atenção (Exemplo: "Por que damos milhões de cliques para [Fofoca Inútil], enquanto ignoramos o impacto real de [Notícia Séria]?").
+            - Mude as palavras da pergunta em cada par. Não invente relações de causa e efeito entre os dois assuntos.
 
-- resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
-  PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
-  PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título.
-  Se for morte ou luto: tom sério e respeitoso, sem ironia.
-  Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
-  Se for fofoca comum: tom levemente irônico sobre a futilidade.
-
-- resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
-
-- pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
-  OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria.
-  PROIBIDO: perguntas genéricas como "o que é mais importante para você?".
-  PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
-  PROIBIDO: culpar o público por ter empatia com tragédias.
-  Varie o formato da pergunta em cada par.
-
-Retorne APENAS JSON válido:
-{{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
-
+            Retorne APENAS JSON válido:
+            {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
                 r = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=[{"role": "user", "content": prompt}],
