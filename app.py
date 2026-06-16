@@ -30,6 +30,7 @@ html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
 #MainMenu, footer { visibility: hidden; }
 
+/* Troca das cores para Azul e fontes aplicadas com !important */
 .hero {
     background: #1a1a1a;
     background-image: linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.8) 100%),
@@ -61,11 +62,12 @@ html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
     line-height: 0.92;
     margin: 0 0 0.15em;
 }
-.hero-title-red { color: #C0392B; }
-.hero-divider { width: 48px; height: 2px; background: #C0392B; margin: 0.5rem auto 1.25rem; }
+.hero-title-red { color: #0000FF !important; }
+.hero-divider { width: 48px; height: 2px; background: #0000FF !important; margin: 0.5rem auto 1.25rem; }
+
 .hero-sub {
-    font-family: 'Lobster Two', cursive;
-    font-weight: 700;
+    font-family: 'Lobster Two', cursive !important;
+    font-weight: 700 !important;
     font-size: clamp(22px, 3.5vw, 36px);
     color: #ffffff;
     margin: 0 0 2.5rem;
@@ -73,18 +75,18 @@ html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
 }
 
 div[data-testid="stButton"] > button {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Lobster Two', cursive !important;
     font-weight: 700 !important;
-    font-size: 15px !important;
+    font-size: 26px !important;
     color: #F5F0E8 !important;
-    background: #C0392B !important;
+    background: #0000FF !important;
     border: none !important;
     border-radius: 0 !important;
-    padding: 0.9rem 2.5rem !important;
+    padding: 1rem 3rem !important;
     letter-spacing: 0.02em !important;
     cursor: pointer !important;
 }
-div[data-testid="stButton"] > button:hover { background: #96281B !important; }
+div[data-testid="stButton"] > button:hover { background: #0000CC !important; }
 
 .datebar {
     background: #1a1a1a;
@@ -99,37 +101,106 @@ div[data-testid="stButton"] > button:hover { background: #96281B !important; }
 }
 
 .noticias-wrap { background: #F5F0E8; max-width: 800px; margin: 0 auto; padding: 3rem 2rem 4rem; }
-.section-eyebrow { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.3rem; }
-.section-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 52px; color: #1a1a1a; margin: 0; }
+
+/* Títulos das notícias centralizados e maiores */
+.section-eyebrow { 
+    font-family: 'Inter', sans-serif; 
+    font-size: 18px !important; 
+    font-weight: 600; 
+    letter-spacing: 0.25em; 
+    text-transform: uppercase; 
+    color: #0000FF !important; 
+    margin-bottom: 0.3rem; 
+    text-align: center !important;
+}
+.section-title { 
+    font-family: 'Playfair Display', serif; 
+    font-weight: 900; 
+    font-size: 64px !important; 
+    color: #1a1a1a; 
+    margin: 0; 
+    text-align: center !important;
+}
+
 .rule-thick { border: none; border-top: 2.5px solid #1a1a1a; margin: 0.75rem 0 0; }
 .rule-thin { border: none; border-top: 0.5px solid #D4C9BC; margin: 0; }
 
 .item-row { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem 0 0.6rem; }
-.item-num { font-family: 'Playfair Display', serif; font-size: 11px; color: #C0392B; font-weight: 700; min-width: 24px; padding-top: 3px; letter-spacing: 0.05em; }
+.item-num { font-family: 'Playfair Display', serif; font-size: 11px; color: #0000FF !important; font-weight: 700; min-width: 24px; padding-top: 3px; letter-spacing: 0.05em; }
 .item-titulo { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.35; margin: 0 0 0.25rem; }
 .item-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: #1a1a1a; font-weight: 500; }
 .item-arrow { margin-left: auto; font-size: 16px; color: #1a1a1a; padding-top: 3px; flex-shrink: 0; }
 
 .reveal-wrap { background: #1a1a1a; padding: 2rem 2rem 1.75rem; margin-bottom: 0.25rem; }
 .reveal-col-label { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
-.label-red { color: #C0392B; }
+.label-red { color: #0000FF !important; }
 .label-gray { color: #ffffff; }
 .reveal-titulo { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #ffffff; line-height: 1.4; margin: 0 0 0.5rem; }
-.reveal-text { font-family: 'Inter', sans-serif; font-size: 14px; color: #ffffff; line-height: 1.75; margin: 0 0 0.6rem; }
-.reveal-link { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #C0392B; text-decoration: none; letter-spacing: 0.05em; }
+
+/* Textos das notícias em Times New Roman Bold */
+.reveal-text { 
+    font-family: 'Times New Roman', Times, serif !important; 
+    font-size: 16px !important; 
+    font-weight: bold !important; 
+    color: #ffffff; 
+    line-height: 1.75; 
+    margin: 0 0 0.6rem; 
+}
+
+.reveal-link { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #0000FF !important; text-decoration: none; letter-spacing: 0.05em; }
 .reveal-inner { display: flex; gap: 0; align-items: stretch; }
 .col-sep { width: 1px; background: #2e2e2e; flex-shrink: 0; margin: 0 1.5rem; }
-.reflexao { font-family: 'Lobster Two', cursive; font-weight: 700; font-size: 24px; color: #ffffff; line-height: 1.5; border-top: 1px solid #2e2e2e; margin-top: 1.5rem; padding-top: 1.25rem; }
+
+/* Pergunta reflexiva em Lobster Two Bold */
+.reflexao { 
+    font-family: 'Lobster Two', cursive !important; 
+    font-weight: 700 !important; 
+    font-size: 26px !important; 
+    color: #ffffff; 
+    line-height: 1.5; 
+    border-top: 1px solid #2e2e2e; 
+    margin-top: 1.5rem; 
+    padding-top: 1.25rem; 
+}
 
 .quem-wrap { background: #1a1a1a; padding: 4.5rem 2rem 5rem; text-align: center; }
-.quem-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.5rem; }
+.quem-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #0000FF !important; margin-bottom: 0.5rem; }
 .quem-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 40px; color: #ffffff; margin: 0 0 0.75rem; }
 .quem-cards { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .quem-card { text-align: center; }
 .quem-nome { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: #ffffff; margin-bottom: 0.2rem; }
-.quem-role { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #ffffff; letter-spacing: 0.12em; text-transform: uppercase; }
-.quem-missao { font-family: 'Inter', sans-serif; font-size: 17px; color: #ffffff; line-height: 1.85; max-width: 560px; margin: 0 auto 2rem; }
-.quem-fgv { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; border-top: 1px solid #2e2e2e; padding-top: 1.5rem; max-width: 480px; margin: 0 auto; line-height: 2; }
+
+/* Textos da seção final em Times New Roman Bold */
+.quem-role { 
+    font-family: 'Times New Roman', Times, serif !important; 
+    font-weight: bold !important; 
+    font-size: 14px !important; 
+    color: #ffffff; 
+    letter-spacing: 0.12em; 
+    text-transform: uppercase; 
+}
+.quem-missao { 
+    font-family: 'Times New Roman', Times, serif !important; 
+    font-weight: bold !important; 
+    font-size: 18px !important; 
+    color: #ffffff; 
+    line-height: 1.85; 
+    max-width: 560px; 
+    margin: 0 auto 2rem; 
+}
+.quem-fgv { 
+    font-family: 'Times New Roman', Times, serif !important; 
+    font-weight: bold !important; 
+    font-size: 14px !important; 
+    letter-spacing: 0.14em; 
+    text-transform: uppercase; 
+    color: #ffffff; 
+    border-top: 1px solid #2e2e2e; 
+    padding-top: 1.5rem; 
+    max-width: 480px; 
+    margin: 0 auto; 
+    line-height: 2; 
+}
 
 [data-testid="stSpinner"] p { font-family: 'Inter', sans-serif !important; color: #1a1a1a !important; font-weight: 600 !important; font-size: 14px !important; }
 </style>
@@ -219,7 +290,7 @@ with c2:
 
             Para cada par, preencha:
 
-            - id_fofoca / id_seria: os IDs dos itens escolhidos
+            - id_fofoca / id_seria: os IDs dos items escolhidos
             - resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
               PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
               PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
@@ -320,7 +391,7 @@ if st.session_state.get("dados_prontos"):
 # ── QUEM SOMOS ────────────────────────────────────────────────────────────────
 quem_html = (
     '<div class="quem-wrap">'
-    '<div class="quem-eyebrow" style="color: #ffffff;">O projeto</div>'
+    '<div class="quem-eyebrow" style="color: #0000FF;">O projeto</div>'
     '<div class="quem-title">Quem somos</div>'
 
     '<div class="quem-cards" style="margin-top:2rem;margin-bottom:2rem;">'
@@ -328,7 +399,7 @@ quem_html = (
     '<img src="data:image/jpeg;base64,' + foto_bianca + '" '
     'style="width:110px;height:110px;border-radius:50%;'
     'object-fit:cover;object-position:center top;'
-    'border:3px solid #C0392B;margin:0 auto 0.75rem;display:block;">'
+    'border:3px solid #0000FF;margin:0 auto 0.75rem;display:block;">'
     '<div class="quem-nome">Bianca Nunes</div>'
     '<div class="quem-role">Co-criadora</div>'
     '</div>'
@@ -336,7 +407,7 @@ quem_html = (
     '<img src="data:image/jpeg;base64,' + foto_mariana + '" '
     'style="width:110px;height:110px;border-radius:50%;'
     'object-fit:cover;object-position:center top;'
-    'border:3px solid #C0392B;margin:0 auto 0.75rem;display:block;">'
+    'border:3px solid #0000FF;margin:0 auto 0.75rem;display:block;">'
     '<div class="quem-nome">Mariana Gontijo</div>'
     '<div class="quem-role">Co-criadora</div>'
     '</div>'
