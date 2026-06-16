@@ -255,8 +255,7 @@ if "aberto" not in st.session_state:
 st.markdown("""
 <div class="hero">
     <div class="hero-eyebrow">Uma leitura diferente do seu feed</div>
-    <div class="hero-title">CORTINA<br>DE <span class="hero-title-red">FUMAÇA</span></div>
-    <div class="hero-divider"></div>
+    <div class="hero-title">CORTINA<br>DE <span style="color: #0000FF !important;">FUMAÇA</span></div>    <div class="hero-divider"></div>
     <div class="hero-sub">Nem tudo que domina sua timeline<br>é o que mais importa sua vida.</div>
 </div>
 """, unsafe_allow_html=True)
