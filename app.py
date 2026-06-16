@@ -23,7 +23,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Dancing+Script:wght@600&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Lobster+Two:ital,wght@0,700;1,700&family=Inter:wght@400;500;600&display=swap');
 
 html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
 [data-testid="stHeader"] { background: transparent; }
@@ -50,7 +50,7 @@ html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
     font-weight: 500;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #C8B8A2;
+    color: #ffffff;
     margin-bottom: 1.25rem;
 }
 .hero-title {
@@ -64,9 +64,10 @@ html, body, [data-testid="stAppViewContainer"] { background-color: #F5F0E8; }
 .hero-title-red { color: #C0392B; }
 .hero-divider { width: 48px; height: 2px; background: #C0392B; margin: 0.5rem auto 1.25rem; }
 .hero-sub {
-    font-family: 'Dancing Script', cursive;
+    font-family: 'Lobster Two', cursive;
+    font-weight: 700;
     font-size: clamp(22px, 3.5vw, 36px);
-    color: #C8B8A2;
+    color: #ffffff;
     margin: 0 0 2.5rem;
     line-height: 1.5;
 }
@@ -87,9 +88,10 @@ div[data-testid="stButton"] > button:hover { background: #96281B !important; }
 
 .datebar {
     background: #1a1a1a;
-    color: #6B6050;
+    color: #ffffff;
     font-family: 'Inter', sans-serif;
     font-size: 11px;
+    font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     text-align: center;
@@ -97,39 +99,39 @@ div[data-testid="stButton"] > button:hover { background: #96281B !important; }
 }
 
 .noticias-wrap { background: #F5F0E8; max-width: 800px; margin: 0 auto; padding: 3rem 2rem 4rem; }
-.section-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.3rem; }
-.section-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 38px; color: #1a1a1a; margin: 0; }
+.section-eyebrow { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.3rem; }
+.section-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 52px; color: #1a1a1a; margin: 0; }
 .rule-thick { border: none; border-top: 2.5px solid #1a1a1a; margin: 0.75rem 0 0; }
 .rule-thin { border: none; border-top: 0.5px solid #D4C9BC; margin: 0; }
 
 .item-row { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem 0 0.6rem; }
 .item-num { font-family: 'Playfair Display', serif; font-size: 11px; color: #C0392B; font-weight: 700; min-width: 24px; padding-top: 3px; letter-spacing: 0.05em; }
 .item-titulo { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.35; margin: 0 0 0.25rem; }
-.item-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: #9A8F82; }
-.item-arrow { margin-left: auto; font-size: 16px; color: #C8B8A2; padding-top: 3px; flex-shrink: 0; }
+.item-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: #1a1a1a; font-weight: 500; }
+.item-arrow { margin-left: auto; font-size: 16px; color: #1a1a1a; padding-top: 3px; flex-shrink: 0; }
 
 .reveal-wrap { background: #1a1a1a; padding: 2rem 2rem 1.75rem; margin-bottom: 0.25rem; }
-.reveal-col-label { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.reveal-col-label { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.6rem; }
 .label-red { color: #C0392B; }
-.label-gray { color: #6B6050; }
-.reveal-titulo { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #F5F0E8; line-height: 1.4; margin: 0 0 0.5rem; }
-.reveal-text { font-family: 'Inter', sans-serif; font-size: 13px; color: #9A8F82; line-height: 1.75; margin: 0 0 0.6rem; }
-.reveal-link { font-family: 'Inter', sans-serif; font-size: 11px; color: #C0392B; text-decoration: none; letter-spacing: 0.05em; }
+.label-gray { color: #ffffff; }
+.reveal-titulo { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #ffffff; line-height: 1.4; margin: 0 0 0.5rem; }
+.reveal-text { font-family: 'Inter', sans-serif; font-size: 14px; color: #ffffff; line-height: 1.75; margin: 0 0 0.6rem; }
+.reveal-link { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #C0392B; text-decoration: none; letter-spacing: 0.05em; }
 .reveal-inner { display: flex; gap: 0; align-items: stretch; }
 .col-sep { width: 1px; background: #2e2e2e; flex-shrink: 0; margin: 0 1.5rem; }
-.reflexao { font-family: 'Dancing Script', cursive; font-size: 19px; color: #C8B8A2; line-height: 1.5; border-top: 1px solid #2e2e2e; margin-top: 1.5rem; padding-top: 1.25rem; font-style: italic; }
+.reflexao { font-family: 'Lobster Two', cursive; font-weight: 700; font-size: 24px; color: #ffffff; line-height: 1.5; border-top: 1px solid #2e2e2e; margin-top: 1.5rem; padding-top: 1.25rem; }
 
 .quem-wrap { background: #1a1a1a; padding: 4.5rem 2rem 5rem; text-align: center; }
-.quem-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.5rem; }
-.quem-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 40px; color: #F5F0E8; margin: 0 0 0.75rem; }
+.quem-eyebrow { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #C0392B; margin-bottom: 0.5rem; }
+.quem-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 40px; color: #ffffff; margin: 0 0 0.75rem; }
 .quem-cards { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .quem-card { text-align: center; }
-.quem-nome { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; color: #F5F0E8; margin-bottom: 0.2rem; }
-.quem-role { font-family: 'Inter', sans-serif; font-size: 11px; color: #6B6050; letter-spacing: 0.12em; text-transform: uppercase; }
-.quem-missao { font-family: 'Inter', sans-serif; font-size: 14px; color: #9A8F82; line-height: 1.85; max-width: 560px; margin: 0 auto 2rem; }
-.quem-fgv { font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8B8A2; border-top: 1px solid #2e2e2e; padding-top: 1.5rem; max-width: 480px; margin: 0 auto; line-height: 2; }
+.quem-nome { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: #ffffff; margin-bottom: 0.2rem; }
+.quem-role { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #ffffff; letter-spacing: 0.12em; text-transform: uppercase; }
+.quem-missao { font-family: 'Inter', sans-serif; font-size: 17px; color: #ffffff; line-height: 1.85; max-width: 560px; margin: 0 auto 2rem; }
+.quem-fgv { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; border-top: 1px solid #2e2e2e; padding-top: 1.5rem; max-width: 480px; margin: 0 auto; line-height: 2; }
 
-[data-testid="stSpinner"] p { font-family: 'Inter', sans-serif !important; color: #9A8F82 !important; font-size: 13px !important; }
+[data-testid="stSpinner"] p { font-family: 'Inter', sans-serif !important; color: #1a1a1a !important; font-weight: 600 !important; font-size: 14px !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -208,32 +210,29 @@ with c2:
                 fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fn]
                 serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in sn]
 
-                prompt = f"""Você é um estrategista de comunicação digital e crítico de mídia. 
+                prompt = f"""Você é um crítico de mídia brasileiro, com ironia leve e inteligente. 
 
-            Seu trabalho: criar 5 PARES ligando uma notícia de entretenimento/fofoca a uma notícia séria da mesma semana.
+            Crie 5 pares: cada par liga uma notícia de entretenimento/fofoca a uma notícia séria da mesma semana.
 
             FOFOCAS DISPONÍVEIS: {json.dumps(fofocas_dieta, ensure_ascii=False)}
             NOTÍCIAS SÉRIAS DISPONÍVEIS: {json.dumps(serias_dieta, ensure_ascii=False)}
 
-            REGRAS DE SEGURANÇA E EMPATIA (MÁXIMA PRIORIDADE):
-            1. O VALOR DA VIDA É ABSOLUTO: Se a 'fofoca' envolver morte, luto, doença ou acidente grave, MUDE SEU COMPORTAMENTO. Jamais trate uma perda humana como 'futilidade' ou pergunte por que as pessoas se importam. É natural se importar com vidas.
-            2. ECONOMIA DA ATENÇÃO: A fofoca e a notícia séria NÃO TÊM RELAÇÃO na vida real. Nunca misture os personagens nas suas explicações.
+            Para cada par, preencha:
 
-            resumo_fofoca:
-            - Escreva um mini parágrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado! Explique o que de fato aconteceu.
-            - SE FOR TRAGÉDIA/LUTO: Use um tom 100% respeitoso, sério e jornalístico. Sem ironias.
-            - SE FOR FOFOCA COMUM: Use tom de deboche suave sobre a futilidade do assunto.
-            
-            resumo_seria:
-            - Escreva um mini parágrafo.
-            - OBRIGATÓRIO: Leia o 'conteudo' raspado.
-            - Explique de forma muito didática como isso afeta a vida, a saúde ou o bolso da sociedade. Sem juridiquês.
-            
-            pergunta_reflexiva:
-            - SE A NOTÍCIA ENVOLVER LUTO/TRAGÉDIA: Sua crítica DEVE ser sobre a MÁQUINA DE CLIQUES. (Exemplo: "Por que a internet transforma até a dor e o luto em um espetáculo para gerar engajamento, enquanto projetos estruturais como [Notícia Séria] ficam escondidos no feed?"). Nunca julgue a empatia do público.
-            - SE FOR FOFOCA COMUM: Faça o usuário pensar sobre atenção (Exemplo: "Por que damos milhões de cliques para [Fofoca Inútil], enquanto ignoramos o impacto real de [Notícia Séria]?").
-            - Mude as palavras da pergunta em cada par. Não invente relações de causa e efeito entre os dois assuntos.
+            - id_fofoca / id_seria: os IDs dos itens escolhidos
+            - resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
+              PASSO 1: leia o campo "conteudo" e classifique o tom: é celebração/meme, tragédia/luto, ou fofoca comum?
+              PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título — títulos podem ser irônicos ou enganosos.
+              Se for morte ou luto: tom sério e respeitoso, sem ironia.
+              Se for meme ou celebração: explique o que aconteceu de verdade, com leveza.
+              Se for fofoca comum: tom levemente irônico sobre a futilidade.
+            - resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
+            - pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
+              OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
+              PROIBIDO: perguntas genéricas como "o que é mais importante para você?" ou "passado vs futuro?".
+              PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
+              PROIBIDO: culpar o público por ter empatia com tragédias — critique a máquina de cliques, não as pessoas.
+              Varie o formato da pergunta em cada par.
 
             Retorne APENAS JSON válido:
             {{"pares": [{{"id_fofoca": "...", "resumo_fofoca": "...", "id_seria": "...", "resumo_seria": "...", "pergunta_reflexiva": "..."}}]}}"""
@@ -321,7 +320,7 @@ if st.session_state.get("dados_prontos"):
 # ── QUEM SOMOS ────────────────────────────────────────────────────────────────
 quem_html = (
     '<div class="quem-wrap">'
-    '<div class="quem-eyebrow">O projeto</div>'
+    '<div class="quem-eyebrow" style="color: #ffffff;">O projeto</div>'
     '<div class="quem-title">Quem somos</div>'
 
     '<div class="quem-cards" style="margin-top:2rem;margin-bottom:2rem;">'
@@ -343,8 +342,8 @@ quem_html = (
     '</div>'
     '</div>'
 
-    '<div style="font-family:\'Playfair Display\', serif;font-size:clamp(22px,3vw,32px);'
-    'font-weight:700;color:#C8B8A2;margin:0 auto 2.5rem;max-width:520px;line-height:1.4;">'
+    '<div style="font-family:\'Lobster Two\', cursive; font-size:clamp(26px,4vw,38px);'
+    'font-weight:700;color:#ffffff;margin:0 auto 2.5rem;max-width:520px;line-height:1.4;">'
     'Mas por que a Cortina de Fumaça?'
     '</div>'
 
