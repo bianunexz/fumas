@@ -205,8 +205,8 @@ with c2:
                 st.session_state.fofocas_originais = {f["id"]: f for f in fn}
                 st.session_state.serias_originais  = {s["id"]: s for s in sn}
 
-                fd = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fn]
-                sd = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in sn]
+                fofocas_dieta = [{"id": f["id"], "titulo": f["titulo"], "veiculo": f["veiculo"], "conteudo": f["conteudo"]} for f in fn]
+                serias_dieta = [{"id": s["id"], "titulo": s["titulo"], "veiculo": s["veiculo"], "conteudo": s["conteudo"]} for s in sn]
 
                 prompt = f"""Você é um estrategista de comunicação digital e crítico de mídia. 
 
