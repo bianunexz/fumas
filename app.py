@@ -143,13 +143,14 @@ with c2:
             Para cada par, preencha:
 
             - id_fofoca / id_seria: os IDs dos itens escolhidos
-            - resumo_fofoca: 2 frases sobre O QUE ACONTECEU de fato.
-              PASSO 1: leia o campo "conteudo" e classifique o tom.
-              PASSO 2: escreva o resumo com esse tom. NUNCA baseie só no título.
-              Se for morte ou luto: tom sério e respeitoso, sem ironia.
-              Se for fofoca comum: tom levemente irônico sobre a futilidade.
-            - resumo_seria: 2 frases explicando como isso afeta a vida real das pessoas. Didático, sem juridiquês.
-            - pergunta_reflexiva: 1 pergunta que faça o leitor refletir sobre atenção e prioridades.
+            resumo_fofoca: escreva um mini paragrafo explicando o que aconteceu de fato.
+            PASSO 1: leia o conteúdo completo da notícia e identifique seu tom.
+            PASSO 2: escreva o resumo utilizando esse tom e nunca se baseando apenas no título.
+            Se o assunto envolver morte ou luto, utilize um tom sério e respeitoso, sem ironia.
+            Se for uma fofoca comum, utilize uma ironia leve sobre a sua futilidade.
+            resumo_seria: escreva um mini paragrafo explicando como essa notícia afeta a vida real das pessoas. Utilize uma linguagem didática e evite juridiquês.
+            pergunta_reflexiva: crie uma pergunta que faça o leitor refletir sobre atenção e prioridades.
+
               OBRIGATÓRIO: mencione o assunto específico da fofoca E o assunto específico da notícia séria na pergunta.
               PROIBIDO: perguntas genéricas.
               PROIBIDO: inventar relação de causa e efeito entre os dois assuntos.
